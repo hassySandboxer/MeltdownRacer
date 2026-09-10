@@ -17,6 +17,7 @@ export type Neutron = {
 export type Input = {
   tick: number;
   rods?: number;
+  rod?: { index: number; depth: number };
   flow?: number;
   refill?: number;
 };
@@ -29,7 +30,10 @@ export type Replay = {
 };
 export class Simulation {
   tick = 0;
-  rods = 60;
+  rodDepths = [60, 60, 60, 60];
+  get rods() {
+    return this.rodDepths.reduce((a, b) => a + b, 0) / 4;
+  }
   flow = 42;
   temperature = 32;
   waterTemp = 20;
@@ -107,6 +111,14 @@ export class Simulation {
   }
   input(action: Omit<Input, "tick">) {
     if (this.ended) return false;
+    if (
+      action.rod &&
+      (!Number.isInteger(action.rod.index) ||
+        action.rod.index < 0 ||
+        action.rod.index > 3 ||
+        !Number.isFinite(action.rod.depth))
+    )
+      return false;
     if (action.refill !== undefined) {
       if (
         !Number.isInteger(action.refill) ||
@@ -128,15 +140,20 @@ export class Simulation {
       this.cooldown = C.refillCooldown;
     }
     if (action.rods !== undefined && Number.isFinite(action.rods))
-      this.rods = clamp(action.rods);
+      this.rodDepths.fill(clamp(action.rods));
+    if (action.rod) this.rodDepths[action.rod.index] = clamp(action.rod.depth);
     if (action.flow !== undefined && Number.isFinite(action.flow))
       this.flow = clamp(action.flow);
-    this.replay.inputs.push({ ...action, tick: this.tick });
+    this.replay.inputs.push({
+      ...action,
+      ...(action.rod ? { rod: { ...action.rod } } : {}),
+      tick: this.tick,
+    });
     return true;
   }
   rodRects() {
     return [-135, -45, 45, 135].map((x, i) => {
-      const depth = clamp(this.rods * 4 - i * 100) / 100;
+      const depth = this.rodDepths[i] / 100;
       const top = -Math.sqrt(C.radius ** 2 - x ** 2);
       return { x: x - 7, y: top, w: 14, h: depth * (-top * 2) };
     });

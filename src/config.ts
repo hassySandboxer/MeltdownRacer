@@ -1,6 +1,6 @@
 // All values are fictional arcade units, not real reactor operating conditions.
-export const VERSION = "0.1.0";
-export const CONFIG_VERSION = 1;
+export const VERSION = "0.2.0";
+export const CONFIG_VERSION = 2;
 export const C = {
   dt: 1 / 60,
   radius: 235,

@@ -16,16 +16,20 @@ export interface RankingClient {
 }
 export class LocalRanking implements RankingClient {
   list(): RecordEntry[] {
+    return this.readAll()
+      .filter((r) => r.version === VERSION)
+      .slice(0, 50);
+  }
+  private readAll(): RecordEntry[] {
     try {
       const data: unknown = JSON.parse(
         localStorage.getItem("meltdown-racer.records") || "[]",
       );
       return Array.isArray(data)
-        ? data
-            .filter(
-              (r) => r && r.version === VERSION && Number.isFinite(r.score),
-            )
-            .slice(0, 50)
+        ? data.filter(
+            (r) =>
+              r && typeof r.version === "string" && Number.isFinite(r.score),
+          )
         : [];
     } catch {
       return [];
@@ -47,7 +51,10 @@ export class LocalRanking implements RankingClient {
       ];
       localStorage.setItem(
         "meltdown-racer.records",
-        JSON.stringify(rows.sort((a, b) => b.score - a.score).slice(0, 50)),
+        JSON.stringify([
+          ...this.readAll().filter((r) => r.version !== VERSION),
+          ...rows.sort((a, b) => b.score - a.score).slice(0, 50),
+        ]),
       );
       return true;
     } catch {

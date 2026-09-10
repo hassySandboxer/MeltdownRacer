@@ -2,15 +2,16 @@ import "./style.css";
 import { Simulation, type Mode } from "./simulation";
 import { C } from "./config";
 import { render } from "./rendering";
+import { drawEffects, drawPlant } from "./effects";
 import { LocalRanking, japanDate, dailySeed } from "./ranking";
 import { GameAudio } from "./audio";
 const $ = <T extends HTMLElement = HTMLElement>(id: string) =>
   document.getElementById(id) as T;
 document.querySelector("#app")!.innerHTML = `
-<header><a class="brand" href="./"><span class="brand-icon">M<span>↗</span></span><div>MELTDOWN<span class="brand-light">RACER</span><small>REACTOR CONTROL / ARCADE EXPERIMENT</small></div></a><div class="header-actions"><span class="local-dot">LOCAL SYSTEM</span><button id="sound" aria-pressed="false">音声 ON</button><button id="help">遊び方</button></div></header>
-<main><div class="page-heading"><div><p class="eyebrow">CONTROL ROOM / 01</p><h1>臨界を、乗りこなせ。</h1><p class="intro">連鎖を育て、熱を逃がす。限界の手前が、ハイスコア。</p></div><div class="session"><span id="mode-label">SURVIVAL</span><strong id="clock">00:00</strong><button id="pause" disabled>一時停止</button></div></div>
+<header><a class="brand" href="./"><span class="brand-icon">M<span>↗</span></span><div>MELTDOWN<span class="brand-light">RACER</span><small>REACTOR CONTROL / ARCADE EXPERIMENT</small></div></a><div class="header-actions"><span class="local-dot">LOCAL SYSTEM</span><button id="sound" aria-pressed="false">音声 ON</button><button id="records-open">記録</button><button id="effects" aria-pressed="true">演出 ON</button><button id="help">?</button></div></header>
+<main><div class="page-heading"><div><p class="eyebrow">CONTROL ROOM / 01</p><h1>臨界を、乗りこなせ。</h1><p class="intro">連鎖を育て、熱を逃がす。限界の手前が、ハイスコア。</p></div><div class="session"><span id="mode-label">SURVIVAL</span><strong id="clock">00:00</strong><button id="speed" disabled title="シミュレーションを早送り">▶ ×1</button><button id="pause" disabled>停止</button></div></div>
 <section class="score-strip" aria-label="運転成績"><div><label>TOTAL SCORE / 得点</label><strong id="score">000000</strong></div><div><label>NET OUTPUT / 正味出力</label><strong><span id="power">0</span><small>PU</small></strong></div><div><label>ENERGY / 累計発電</label><strong><span id="energy">0.000</span><small>EU</small></strong></div><div class="multiplier"><label>SCORE MULTIPLIER</label><strong id="multiplier">×1.00</strong></div></section>
-<div class="game-layout"><section class="reactor-panel"><div class="panel-heading"><span><i class="status-dot"></i> REACTOR CORE</span><span id="state">STANDBY / 待機中</span></div><div class="core-wrap"><canvas id="core" width="560" height="560" aria-label="円形炉。緑の燃料、白い中性子、灰色の使用済み燃料。区画をクリックして補給先を選択。"></canvas><div class="core-tag tag-left">01<br><span>FISSION<br>CHAMBER</span></div><div class="core-tag tag-right">CORE<br><span id="fuel-count">0 CELLS</span></div><div id="overlay" class="overlay"><p class="eyebrow">WELCOME, OPERATOR</p><h2>連鎖反応を<br>あなたの手に。</h2><p>制御棒・冷却水・燃料を操り、<br>長く、熱く、発電を続けよう。</p><div class="mode-select"><button id="survival-mode" class="selected">生存モード</button><button id="daily-mode">日替わり 5分</button></div><button id="start" class="primary">運転を開始 <span>↗</span></button><small id="start-note">失敗するまで続く、生存チャレンジ</small></div></div><div class="legend"><span><i class="fuel-dot"></i>燃料</span><span><i class="neutron-dot"></i>中性子</span><span><i class="spent-dot"></i>使用済み</span><span><i class="rod-dot"></i>制御棒</span></div><div class="fever-track"><div><span id="fever-title">FEVER STANDBY</span><strong id="fever-time">0.0 s</strong></div><div class="track"><i id="fever-bar"></i></div><p id="hint">反応 1.8〜15 / 出力 12 以上を5秒維持でフィーバー</p></div></section>
+<div class="game-layout"><section class="reactor-panel"><div class="panel-heading"><span><i class="status-dot"></i> REACTOR CORE</span><span id="state">STANDBY / 待機中</span></div><div class="core-wrap"><canvas id="core" width="560" height="560" aria-label="円形炉。緑の燃料、白い中性子、灰色の使用済み燃料。区画をクリックして補給先を選択。"></canvas><div class="core-tag tag-left">01<br><span>FISSION<br>CHAMBER</span></div><div class="core-tag tag-right">CORE<br><span id="fuel-count">0 CELLS</span></div><div id="overlay" class="overlay"><p class="eyebrow">WELCOME, OPERATOR</p><h2>連鎖反応を<br>あなたの手に。</h2><p>制御棒・冷却水・燃料を操り、<br>長く、熱く、発電を続けよう。</p><div class="mode-select"><button id="survival-mode" class="selected">生存モード</button><button id="daily-mode">日替わり 5分</button></div><button id="start" class="primary">運転を開始 <span>↗</span></button><small id="start-note">失敗するまで続く、生存チャレンジ</small></div></div><div class="plant"><canvas id="plant" aria-label="冷却水槽、水流、蒸気配管と発電タービン"></canvas><div class="plant-readout"><span id="cooling-info"></span><span id="pump-info"></span></div></div><div class="legend"><span><i class="fuel-dot"></i>燃料</span><span><i class="neutron-dot"></i>中性子</span><span><i class="spent-dot"></i>使用済み</span><span><i class="rod-dot"></i>制御棒</span></div><div class="fever-track"><div><span id="fever-title">FEVER STANDBY</span><strong id="fever-time">0.0 s</strong></div><div class="track"><i id="fever-bar"></i></div><p id="hint">反応 1.8〜15 / 出力 12 以上を5秒維持でフィーバー</p></div></section>
 <aside><section class="panel telemetry"><div class="panel-heading"><span>LIVE TELEMETRY</span><span class="dim">架空のゲーム指標</span></div>${[
   ["reaction", "反応の勢い", "/ s"],
   ["temperature", "炉温", "/ 150"],
@@ -24,15 +25,20 @@ document.querySelector("#app")!.innerHTML = `
       `<div class="meter ${id}"><div><label>${label}</label><strong id="${id}">0</strong><small>${unit}</small></div><div class="track"><i id="${id}-bar"></i></div></div>`,
   )
   .join("")}</section>
-<section class="panel controls"><div class="panel-heading"><span>OPERATOR CONTROLS</span><span class="dim">手動操作</span></div><label class="control-label" for="rods">01 <b>制御棒</b><output id="rods-value">60%</output></label><input id="rods" type="range" min="0" max="100" value="60"><div class="range-caption"><span>引き抜く / 反応 ↑</span><span>挿入 / 反応 ↓</span></div><label class="control-label" for="flow">02 <b>冷却水の流量</b><output id="flow-value">42%</output></label><input id="flow" type="range" min="0" max="100" value="42"><div class="range-caption"><span>低流量 / 省電力</span><span>高流量 / 冷却 ↑</span></div><div class="control-label">03 <b>燃料補給</b><output id="refills">8 回</output></div><div class="sectors" aria-label="補給区画">${["左上", "右上", "左下", "右下"].map((x, i) => `<button data-sector="${i}" class="${i === 0 ? "selected" : ""}" aria-pressed="${i === 0}">${x}<span id="sector-${i}">0 使用済み</span></button>`).join("")}</div><button id="refill" class="refill" disabled>選択区画を補給 <span>↻</span></button><p class="keyboard">A / D 制御棒　 W / S 流量　 R 補給　 Space 停止</p></section></aside></div>
-<section class="records panel"><div class="panel-heading"><span>PERSONAL BEST / ローカル記録</span><span class="dim">このブラウザに保存</span></div><div id="records"></div></section><footer><span>MELTDOWNRACER <b>v0.1</b> / LOCAL EDITION</span><span>架空のアーケードゲームです。実在の原子炉を再現するものではありません。</span></footer></main>
-<dialog id="help-dialog"><div class="dialog-body"><p class="eyebrow">OPERATOR’S GUIDE</p><h2>熱と連鎖は、別のもの。</h2><p>白い中性子が緑の燃料に当たると、確率で分裂。熱と次の中性子を生みます。灰色の燃料は使用済みです。</p><ol><li><b>制御棒</b>を挿入すると中性子を吸収します。反応を抑えても、蓄積した熱はすぐには消えません。</li><li><b>冷却水</b>で炉温を下げ、水位を回復。ポンプにも電力が必要なため、流量を上げすぎると正味出力が下がります。</li><li><b>区画を選んで補給</b>すると使用済み燃料を交換。8回まで・12秒間隔で使えます。</li><li>反応 1.8〜15、出力 12 以上を5秒維持して<b>フィーバー</b>。安定倍率は最大3倍、高温倍率は最大2倍です。</li><li>炉温105または圧力100を超えると危険度が上昇。100%で設備破裂。開始20秒後から、低反応かつ炉温30未満が10秒続くと低温停止です。</li></ol><p>タブを離れると自動停止します。日替わりは日本時間の日付で共通シードを使用するローカル練習版です。</p><button id="close-help" class="primary">操作室に戻る</button></div></dialog>`;
+<section class="panel controls"><div class="panel-heading"><span>OPERATOR CONTROLS</span><span class="dim">手動操作</span></div><div class="rod-heading"><b>制御棒 <small>引抜 ← → 挿入</small></b><label><input id="link-rods" type="checkbox" checked>4本同時</label></div><div class="rod-controls">${[0, 1, 2, 3].map((i) => `<label for="rod-${i}">${i + 1}<input id="rod-${i}" type="range" min="0" max="100" value="60" aria-label="制御棒${i + 1}"><output id="rod-value-${i}">60%</output></label>`).join("")}</div><label class="control-label" for="flow">02 <b>冷却水の流量</b><output id="flow-value">42%</output></label><input id="flow" type="range" min="0" max="100" value="42"><div class="range-caption"><span>低流量 / 省電力</span><span>高流量 / 冷却 ↑</span></div><div class="control-label"><b>燃料補給</b><output id="refills">残り 8 / 8 回</output></div><p class="refill-rule">1回で選択区画の灰色燃料を交換・12秒間隔</p><div class="sectors" aria-label="補給区画">${["左上", "右上", "左下", "右下"].map((x, i) => `<button data-sector="${i}" class="${i === 0 ? "selected" : ""}" aria-pressed="${i === 0}">${x}<span id="sector-${i}">0 使用済み</span></button>`).join("")}</div><button id="refill" class="refill" disabled>選択区画を補給 <span>↻</span></button><p class="keyboard">A / D 制御棒　 W / S 流量　 R 補給　 Space 停止</p></section></aside></div>
+<dialog id="records-dialog"><button id="records-close">閉じる</button><section class="records panel"><div class="panel-heading"><span>PERSONAL BEST / ローカル記録</span><span class="dim">このブラウザに保存</span></div><div id="records"></div></section></dialog><footer><span>MELTDOWNRACER <b>v0.2</b> / LOCAL EDITION</span><span>架空のアーケードゲームです。実在の原子炉を再現するものではありません。</span></footer></main>
+<canvas id="fx" aria-hidden="true"></canvas><dialog id="help-dialog"><div class="dialog-body"><p class="eyebrow">OPERATOR’S GUIDE</p><h2>熱と連鎖は、別のもの。</h2><p>白い中性子が緑の燃料に当たると、確率で分裂。熱と次の中性子を生みます。灰色の燃料は使用済みです。</p><ol><li><b>制御棒</b>は4本独立。「4本同時」がONならどのスライダーも全棒を同じ深さに動かします。OFFでは1〜4キーで選んだ棒をA/Dでも操作できます。挿入すると中性子を吸収します。反応を抑えても、蓄積した熱はすぐには消えません。</li><li><b>冷却水</b>で炉温を下げ、水位を回復。ポンプにも電力が必要なため、流量を上げすぎると正味出力が下がります。</li><li><b>区画を選んで補給</b>すると使用済み燃料を交換。8回まで・12秒間隔で使えます。</li><li>反応 1.8〜15、出力 12 以上を5秒維持して<b>フィーバー</b>。安定倍率は最大3倍、高温倍率は最大2倍です。</li><li>炉温105または圧力100を超えると危険度が上昇。100%で設備破裂。開始20秒後から、低反応かつ炉温30未満が10秒続くと低温停止です。</li></ol><p>▶ ×1ボタンで2倍・4倍・8倍の早送り。温度・反応・得点すべて同じ速度で進みます。燃料が減った後の待ち時間にも使えます。演出ボタンで強い光と揺れを抑えられます。</p><p>タブを離れると自動停止します。日替わりは日本時間の日付で共通シードを使用するローカル練習版です。</p><button id="close-help" class="primary">操作室に戻る</button></div></dialog>`;
 let mode: Mode = "survival",
   s = new Simulation(7391),
   started = false,
   paused = false,
   selected = 0,
   runDate = japanDate();
+let speed = 1,
+  rodSelected = 0,
+  blastStart = -1,
+  resultShown = false;
+let intense = !matchMedia("(prefers-reduced-motion: reduce)").matches;
 const audio = new GameAudio(),
   ranking = new LocalRanking();
 const canvas = $<HTMLCanvasElement>("core");
@@ -84,12 +90,14 @@ function start() {
   started = true;
   paused = false;
   accumulator = 0;
+  speed = 1;
+  blastStart = -1;
+  resultShown = false;
   $("overlay").hidden = true;
   $<HTMLButtonElement>("pause").disabled = false;
   $("pause").textContent = "一時停止";
   audio.start();
-  for (const id of ["rods", "flow"])
-    $<HTMLInputElement>(id).value = String(s[id as "rods" | "flow"]);
+  syncControls();
 }
 $("start").onclick = start;
 function togglePause(force?: boolean) {
@@ -118,11 +126,51 @@ $("help").onclick = () => {
   $<HTMLDialogElement>("help-dialog").showModal();
 };
 $("close-help").onclick = () => $<HTMLDialogElement>("help-dialog").close();
-for (const id of ["rods", "flow"] as const)
-  $<HTMLInputElement>(id).oninput = () => {
-    if (started && !paused && !s.ended)
-      s.input({ [id]: Number($<HTMLInputElement>(id).value) });
+function syncControls() {
+  for (let i = 0; i < 4; i++)
+    $<HTMLInputElement>("rod-" + i).value = String(s.rodDepths[i]);
+  $<HTMLInputElement>("flow").value = String(s.flow);
+}
+for (let i = 0; i < 4; i++)
+  $<HTMLInputElement>("rod-" + i).oninput = () => {
+    if (!started || paused || s.ended) return;
+    rodSelected = i;
+    const depth = Number($<HTMLInputElement>("rod-" + i).value);
+    s.input(
+      $<HTMLInputElement>("link-rods").checked
+        ? { rods: depth }
+        : { rod: { index: i, depth } },
+    );
+    syncControls();
   };
+$<HTMLInputElement>("link-rods").onchange = () => {
+  if (
+    started &&
+    !paused &&
+    !s.ended &&
+    $<HTMLInputElement>("link-rods").checked
+  ) {
+    s.input({ rods: s.rodDepths[rodSelected] });
+    syncControls();
+  }
+};
+$<HTMLInputElement>("flow").oninput = () => {
+  if (started && !paused && !s.ended)
+    s.input({ flow: Number($<HTMLInputElement>("flow").value) });
+};
+$("speed").onclick = () => {
+  speed = speed === 8 ? 1 : speed * 2;
+};
+$("effects").onclick = () => {
+  intense = !intense;
+};
+$("records-open").onclick = () => {
+  togglePause(true);
+  records();
+  $<HTMLDialogElement>("records-dialog").showModal();
+};
+$("records-close").onclick = () =>
+  $<HTMLDialogElement>("records-dialog").close();
 function selectSector(i: number) {
   selected = i;
   document.querySelectorAll<HTMLButtonElement>("[data-sector]").forEach((b) => {
@@ -145,7 +193,7 @@ $("refill").onclick = () => {
 };
 window.addEventListener("keydown", (e) => {
   if (
-    $<HTMLDialogElement>("help-dialog").open ||
+    document.querySelector("dialog[open]") ||
     (e.target instanceof HTMLElement &&
       ["INPUT", "SELECT", "TEXTAREA"].includes(e.target.tagName))
   )
@@ -159,10 +207,17 @@ window.addEventListener("keydown", (e) => {
   if (!started || paused || s.ended) return;
   const k = e.key.toLowerCase();
   if (k === "r") s.input({ refill: selected });
-  if (k === "a" || k === "d") s.input({ rods: s.rods + (k === "d" ? 5 : -5) });
+  if ("1234".includes(k)) rodSelected = Number(k) - 1;
+  if (k === "a" || k === "d") {
+    const depth = s.rodDepths[rodSelected] + (k === "d" ? 5 : -5);
+    s.input(
+      $<HTMLInputElement>("link-rods").checked
+        ? { rods: depth }
+        : { rod: { index: rodSelected, depth } },
+    );
+  }
   if (k === "w" || k === "s") s.input({ flow: s.flow + (k === "w" ? 5 : -5) });
-  for (const id of ["rods", "flow"] as const)
-    $<HTMLInputElement>(id).value = String(s[id]);
+  syncControls();
 });
 function finish() {
   const saved = ranking.save(s, runDate);
@@ -210,10 +265,21 @@ function updateUI() {
             : 100;
     $(id + "-bar").style.width = `${Math.min(100, (s[id] / max) * 100)}%`;
   }
-  for (const id of ["rods", "flow"] as const) {
-    $(id + "-value").textContent = `${s[id]}%`;
-    $<HTMLInputElement>(id).disabled = !started || paused || s.ended;
+  for (let i = 0; i < 4; i++) {
+    $("rod-value-" + i).textContent = s.rodDepths[i] + "%";
+    $<HTMLInputElement>("rod-" + i).disabled = !started || paused || s.ended;
   }
+  $("flow-value").textContent = s.flow + "%";
+  $<HTMLInputElement>("flow").disabled = !started || paused || s.ended;
+  $<HTMLInputElement>("link-rods").disabled = paused || s.ended;
+  $("speed").textContent = "▶ ×" + speed;
+  $<HTMLButtonElement>("speed").disabled = !started || s.ended;
+  $("effects").textContent = intense ? "演出 ON" : "演出 OFF";
+  $("effects").setAttribute("aria-pressed", String(intense));
+  $("cooling-info").textContent =
+    "水位 " + Math.round(s.water) + "% · 流量 " + s.flow + "%";
+  $("pump-info").textContent =
+    "ポンプ −" + (3 + s.flow * 0.38).toFixed(0) + " PU";
   $("state").textContent = s.ended
     ? "OFFLINE / 運転終了"
     : paused
@@ -229,9 +295,11 @@ function updateUI() {
               : "ONLINE / 運転中";
   document.body.classList.toggle("fever", s.fever > 0 && !s.ended);
   $("fuel-count").textContent = `${s.remainingFuel} / ${s.fuel.length} CELLS`;
-  $("fever-title").textContent = s.fever
-    ? "FEVER ACTIVE / 臨界キープ"
-    : "FEVER STANDBY";
+  $("fever-title").textContent = s.ended
+    ? "SESSION COMPLETE"
+    : s.fever
+      ? "FEVER ACTIVE / 臨界キープ"
+      : "FEVER STANDBY";
   $("fever-time").textContent = `${s.fever.toFixed(1)} s`;
   $("fever-bar").style.width =
     `${Math.min(100, (s.stable / C.feverSeconds) * 100)}%`;
@@ -245,7 +313,7 @@ function updateUI() {
           : s.fever
             ? "臨界キープ！反応と正味出力を保って倍率アップ"
             : "反応 1.8〜15 / 出力 12 以上を5秒維持でフィーバー";
-  $("refills").textContent = `${s.refills} 回`;
+  $("refills").textContent = `残り ${s.refills} / ${C.refills} 回`;
   let count = 0;
   for (let i = 0; i < 4; i++) {
     const n = s.fuel.filter((f) => f.sector === i && f.spent).length;
@@ -260,24 +328,46 @@ function updateUI() {
     s.cooldown > 0 ||
     count === 0;
   $("refill").innerHTML =
-    s.cooldown > 0
-      ? `補給準備中 ${s.cooldown.toFixed(1)} s`
-      : `選択区画を補給 <span>↻</span>`;
+    s.refills === 0
+      ? "補給終了：8回使用済み"
+      : s.cooldown > 0
+        ? `補給準備中 ${s.cooldown.toFixed(1)} s`
+        : `選択区画を補給 <span>↻</span>`;
 }
 function frame(now: number) {
   const elapsed = Math.min((now - last) / 1000, 0.1);
   last = now;
   if (started && !paused && !s.ended) {
-    accumulator += elapsed;
+    accumulator += elapsed * speed;
     while (accumulator >= C.dt && !s.ended) {
       s.step();
       accumulator -= C.dt;
-      if (s.ended) finish();
+      if (s.ended) {
+        if (s.danger >= 100) {
+          blastStart = now;
+          audio.explode();
+        } else {
+          finish();
+          resultShown = true;
+        }
+      }
     }
     audio.update(s.time, s.fever > 0, s.danger > 0);
   }
   updateUI();
   render(canvas, s, selected);
+  drawPlant($<HTMLCanvasElement>("plant"), s);
+  drawEffects(
+    $<HTMLCanvasElement>("fx"),
+    s,
+    blastStart < 0 ? -1 : (now - blastStart) / 1000,
+    intense,
+    paused,
+  );
+  if (blastStart >= 0 && !resultShown && now - blastStart > 3000) {
+    finish();
+    resultShown = true;
+  }
   requestAnimationFrame(frame);
 }
 records();

@@ -45,8 +45,33 @@ export function render(
   g.addColorStop(1, "#07191f");
   ctx.fillStyle = g;
   ctx.fillRect(-240, -240, 480, 480);
-  ctx.fillStyle = "#3393a716";
-  ctx.fillRect(-240, 235 - s.water * 4.7, 480, 480);
+  const surface = 235 - s.water * 4.7;
+  ctx.fillStyle = "#2786aa38";
+  ctx.fillRect(-240, surface, 480, 480);
+  ctx.beginPath();
+  for (let x = -240; x <= 240; x += 4) {
+    const y = surface + Math.sin(x * 0.04 + s.time * 2) * 3;
+    if (x === -240) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.strokeStyle = "#81eaff";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  if (s.flow > 0 && s.tick > 0 && !s.ended)
+    for (let i = 0; i < Math.ceil(s.flow / 7); i++) {
+      const y = 235 - ((s.time * (15 + s.flow) + i * 37) % 470),
+        x = -220 + ((i * 47) % 440);
+      if (y < surface) continue;
+      ctx.strokeStyle = "#6adfff65";
+      ctx.lineWidth = 1 + s.flow / 60;
+      ctx.beginPath();
+      ctx.moveTo(x, y + 8 + s.flow * 0.15);
+      ctx.lineTo(x, y);
+      ctx.lineTo(x - 3, y + 5);
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + 3, y + 5);
+      ctx.stroke();
+    }
   ctx.fillStyle = "#bbee7710";
   ctx.fillRect(sector % 2 ? 0 : -240, sector >= 2 ? 0 : -240, 240, 240);
   ctx.setLineDash([3, 8]);
@@ -111,4 +136,10 @@ export function render(
     ctx.fillRect(-240, -240, 480, 480);
   }
   ctx.restore();
+  s.rodRects().forEach((r, i) => {
+    ctx.fillStyle = "#edc98b";
+    ctx.font = "bold 13px monospace";
+    ctx.textAlign = "center";
+    ctx.fillText(String(i + 1), r.x + 7, r.y - 9);
+  });
 }

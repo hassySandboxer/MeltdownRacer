@@ -10,6 +10,28 @@ import { C } from "../src/config";
 const advance = (s: Simulation, seconds: number) => {
   for (let i = 0; i < Math.round(seconds / C.dt); i++) s.step();
 };
+test("four rods move independently and common control gives equal insertion depth", () => {
+  const s = new Simulation(10);
+  s.input({ rod: { index: 2, depth: 15 } });
+  assert.deepEqual(s.rodDepths, [60, 60, 15, 60]);
+  s.rodRects().forEach((r, i) =>
+    assert.ok(Math.abs(r.h / (-r.y * 2) - s.rodDepths[i] / 100) < 1e-12),
+  );
+  s.input({ rods: 35 });
+  assert.deepEqual(s.rodDepths, [35, 35, 35, 35]);
+  assert.equal(s.input({ rod: { index: 4, depth: 50 } }), false);
+  assert.equal(s.input({ rod: { index: 0, depth: NaN } }), false);
+});
+test("independent rod inputs replay without sharing mutable input objects", () => {
+  const s = new Simulation(8);
+  const rod = { index: 0, depth: 90 };
+  s.input({ rod });
+  rod.depth = 0;
+  advance(s, 3);
+  s.input({ rod: { index: 3, depth: 10 } });
+  advance(s, 10);
+  assert.deepEqual(playReplay(s.replay, s.tick), s);
+});
 test("same seed and tick inputs reproduce exact results independently of render batching", () => {
   const a = new Simulation(123);
   for (let i = 0; i < 3600; i++) {

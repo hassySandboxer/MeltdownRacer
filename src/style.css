@@ -1395,3 +1395,48 @@ footer {
     margin-top: 2px;
   }
 }
+/* Compact instruments keep the core and feedback within one glance. */
+main { max-width: min(1120px, calc(100dvh + 350px)); }
+#multiplier { display: inline-block; transform-origin: left center; white-space: nowrap; }
+.score-strip > div { min-width: 0; }
+.reactor-panel { grid-template-rows: 20px minmax(0, 1fr) 84px 15px; }
+aside { grid-template-rows: 235px minmax(0, 1fr); }
+.telemetry { gap: 7px 14px; }
+.telemetry .fever-track { grid-column: 1 / -1; padding: 7px; border-radius: 9px; background: #af7fc51a; }
+.telemetry .fever-track .track { height: 15px; border-radius: 8px; overflow: hidden; margin-top: 5px; }
+.telemetry .fever-track p { font-size: 9px; margin: 5px 0 0; line-height: 1.4; }
+@media (max-height: 730px) and (min-width: 701px) {
+  aside { grid-template-rows: 208px minmax(0, 1fr); }
+  .reactor-panel { grid-template-rows: 18px minmax(0, 1fr) 65px 12px; }
+  .telemetry { padding: 8px; gap: 5px 12px; }
+  .controls { gap: 3px; }
+}
+@media (max-width: 700px) {
+  main { max-width: 100%; }
+  .reactor-panel { grid-template-rows: 15px minmax(0, 1fr) 54px; }
+  aside { grid-template-rows: 1fr; grid-template-columns: 116px minmax(0, 1fr); }
+  .telemetry { gap: 3px; padding: 5px; grid-template-rows: auto repeat(6, minmax(0, 1fr)); }
+  .telemetry .fever-track { padding: 3px; }
+  .telemetry .fever-track > div:first-child { font-size: 7px; }
+  .telemetry .fever-track .track { height: 12px; margin-top: 3px; }
+  .telemetry .fever-track p { font-size: 7px; margin-top: 3px; line-height: 1.2; }
+  .meter > div:first-child { margin-bottom: 1px; }
+  .meter strong { font-size: 11px; }
+}
+@media (min-width: 701px) {
+  main { max-width: min(1050px, calc(100dvh + 230px)); }
+}
+@media (max-height: 730px) and (min-width: 701px) {
+  aside { grid-template-rows: 178px minmax(0, 1fr); }
+  .telemetry .fever-track { padding: 4px; }
+  .telemetry .fever-track p { margin-top: 3px; }
+  .telemetry .fever-track .track { height: 12px; margin-top: 3px; }
+  .telemetry .meter > div:first-child { margin-bottom: 2px; }
+  .telemetry .meter strong { font-size: 15px; }
+}
+.telemetry .fever-track { min-width: 0; }
+.telemetry .fever-track p { white-space: normal; }
+@media (max-width: 700px) {
+  .telemetry .fever-track > div:first-child { flex-wrap: wrap; gap: 2px; }
+  .telemetry .fever-track strong { margin-left: auto; }
+}

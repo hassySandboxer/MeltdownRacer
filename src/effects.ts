@@ -16,7 +16,7 @@ function context(canvas: HTMLCanvasElement) {
   c.clearRect(0, 0, w, h);
   return { c, w, h };
 }
-export function drawPlant(canvas: HTMLCanvasElement, s: Simulation) {
+export function drawPlant(canvas: HTMLCanvasElement, s: Simulation, motion: number, intense: boolean) {
   const { c, w, h } = context(canvas);
   c.save();
   c.scale(w / 620, h / 64);
@@ -82,16 +82,23 @@ export function drawPlant(canvas: HTMLCanvasElement, s: Simulation) {
     c.fill();
   }
   c.save();
-  c.translate(460, 37);
-  c.strokeStyle = "#6cb3bd";
+  const heat = clamp((generation - 0.25) / 0.75, 0, 1);
+  const turbineColor = `hsl(${185 * (1 - heat)}, ${45 + heat * 45}%, ${65 - heat * 7}%)`;
+  const hop = intense ? Math.abs(Math.sin(motion * (3 + generation * 7))) * generation * 7 : 0;
+  c.translate(460, 37 - hop);
+  if (intense) {
+    c.shadowColor = turbineColor;
+    c.shadowBlur = generation * 12;
+  }
+  c.strokeStyle = turbineColor;
   c.lineWidth = 2;
   c.beginPath();
   c.arc(0, 0, 21, 0, Math.PI * 2);
   c.stroke();
-  c.rotate(t * (2 + generation * 13));
+  c.rotate(motion * (2 + generation * 13));
   for (let i = 0; i < 8; i++) {
     c.rotate(Math.PI / 4);
-    c.fillStyle = generation > 0.7 ? "#e3ffa4" : "#8dd4dd";
+    c.fillStyle = turbineColor;
     c.beginPath();
     c.moveTo(3, -2);
     c.lineTo(17, -7);

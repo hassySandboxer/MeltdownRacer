@@ -11,8 +11,8 @@ document.querySelector("#app")!.innerHTML = `
 <header><a class="brand" href="./"><span class="brand-orbit">♥</span><span class="pop-logo"><small>どきどき<span>☆</span></small>メルトダウン</span></a><div class="header-actions"><span class="local-dot">LOCAL SYSTEM</span><button id="sound" aria-pressed="false">音声 ON</button><button id="records-open">記録</button><button id="effects" aria-pressed="true">演出 ON</button><button id="help">?</button></div></header>
 <main><div class="page-heading"><div><p class="eyebrow">CONTROL ROOM / 01</p><h1>かわいく発電。油断でドカン。</h1><p class="intro">連鎖を育て、熱を逃がす。限界の手前が、ハイスコア。</p></div><div class="session"><span id="mode-label">SURVIVAL</span><strong id="clock">00:00</strong><button id="speed" disabled title="シミュレーションを早送り">▶ ×1</button><button id="pause" disabled>停止</button></div></div>
 <section class="score-strip" aria-label="運転成績"><div><label>TOTAL SCORE / 得点</label><strong id="score">000000</strong></div><div><label>NET OUTPUT / 正味出力</label><strong><span id="power">0</span><small>PU</small></strong></div><div><label>ENERGY / 累計発電</label><strong><span id="energy">0.000</span><small>EU</small></strong></div><div class="multiplier"><label>SCORE MULTIPLIER</label><strong id="multiplier">×1.00</strong></div></section>
-<div class="game-layout"><section class="reactor-panel"><div class="panel-heading"><span><i class="status-dot"></i> REACTOR CORE</span><span id="state">STANDBY / 待機中</span></div><div class="core-wrap"><canvas id="core" width="560" height="560" aria-label="円形炉。緑の燃料、白い中性子、灰色の使用済み燃料。区画をクリックして補給先を選択。"></canvas><div class="core-tag tag-left">01<br><span>FISSION<br>CHAMBER</span></div><div class="core-tag tag-right">CORE<br><span id="fuel-count">0 CELLS</span></div><div id="overlay" class="overlay"><p class="eyebrow">SWEET LOOKS. SERIOUS REACTOR.</p><h2 class="title-logo"><small>どきどき<span>☆</span></small>メルトダウン</h2><div class="mascot" aria-hidden="true">◕‿◕<span>♥</span></div><p>めざせ臨界フィーバー！<br>かわいい顔して、冷却はシビア。</p><div class="mode-select"><button id="survival-mode" class="selected">生存モード</button><button id="daily-mode">日替わり 5分</button><button id="endless-mode">∞ ショップ</button></div><button id="start" class="primary">運転を開始 <span>↗</span></button><small id="start-note">失敗するまで続く、生存チャレンジ</small></div></div><div class="plant"><canvas id="plant" aria-label="冷却水槽、水流、蒸気配管と発電タービン"></canvas><div class="plant-readout"><span id="cooling-info"></span><span id="pump-info"></span></div></div><div class="legend"><span><i class="fuel-dot"></i>燃料</span><span><i class="neutron-dot"></i>中性子</span><span><i class="spent-dot"></i>使用済み</span><span><i class="rod-dot"></i>制御棒</span></div><div class="fever-track"><div><span id="fever-title">FEVER STANDBY</span><strong id="fever-time">0.0 s</strong></div><div class="track"><i id="fever-bar"></i></div><p id="hint">反応 1.8〜15 / 出力 12 以上を5秒維持でフィーバー</p></div></section>
-<aside><section class="panel telemetry"><div class="panel-heading"><span>LIVE TELEMETRY</span><span class="dim">架空のゲーム指標</span></div>${[
+<div class="game-layout"><section class="reactor-panel"><div class="panel-heading"><span><i class="status-dot"></i> REACTOR CORE</span><span id="state">STANDBY / 待機中</span></div><div class="core-wrap"><canvas id="core" width="560" height="560" aria-label="円形炉。緑の燃料、白い中性子、灰色の使用済み燃料。区画をクリックして補給先を選択。"></canvas><div class="core-tag tag-left">01<br><span>FISSION<br>CHAMBER</span></div><div class="core-tag tag-right">CORE<br><span id="fuel-count">0 CELLS</span></div><div id="overlay" class="overlay"><p class="eyebrow">SWEET LOOKS. SERIOUS REACTOR.</p><h2 class="title-logo"><small>どきどき<span>☆</span></small>メルトダウン</h2><div class="mascot" aria-hidden="true">◕‿◕<span>♥</span></div><p>めざせ臨界フィーバー！<br>かわいい顔して、冷却はシビア。</p><div class="mode-select"><button id="survival-mode" class="selected">生存モード</button><button id="daily-mode">日替わり 5分</button><button id="endless-mode">∞ ショップ</button></div><button id="start" class="primary">運転を開始 <span>↗</span></button><small id="start-note">失敗するまで続く、生存チャレンジ</small></div></div><div class="plant"><canvas id="plant" aria-label="冷却水槽、水流、蒸気配管と発電タービン"></canvas><div class="plant-readout"><span id="cooling-info"></span><span id="pump-info"></span></div></div><div class="legend"><span><i class="fuel-dot"></i>燃料</span><span><i class="neutron-dot"></i>中性子</span><span><i class="spent-dot"></i>使用済み</span><span><i class="rod-dot"></i>制御棒</span></div></section>
+<aside><section class="panel telemetry"><div class="fever-track"><div><span id="fever-title">FEVER STANDBY</span><strong id="fever-time">0.0 s</strong></div><div class="track"><i id="fever-bar"></i></div><p id="hint">反応 1.8〜15 / 出力 12 以上を5秒維持でフィーバー</p></div><div class="panel-heading"><span>LIVE TELEMETRY</span><span class="dim">架空のゲーム指標</span></div>${[
   ["reaction", "反応の勢い", "/ s"],
   ["temperature", "炉温", "/ 150"],
   ["waterTemp", "水温", "/ 140"],
@@ -34,6 +34,9 @@ let mode: Mode = "survival",
   paused = false,
   selected = 0,
   runDate = japanDate();
+let multiplierPeak = 1;
+let multiplierAnimation: Animation | undefined;
+let plantMotion = 0;
 let speed = 1,
   blastStart = -1,
   resultShown = false;
@@ -101,6 +104,9 @@ function start() {
   paused = false;
   accumulator = 0;
   speed = 1;
+  multiplierPeak = 1;
+  multiplierAnimation?.cancel();
+  plantMotion = 0;
   blastStart = -1;
   resultShown = false;
   $("overlay").hidden = true;
@@ -234,6 +240,23 @@ function updateUI() {
   $("power").textContent = s.power.toFixed(0);
   $("energy").textContent = s.energy.toFixed(3);
   $("multiplier").textContent = `×${s.multiplier.toFixed(2)}`;
+  const milestone = Math.floor(s.multiplier + 1e-8);
+  if (started && !paused && !s.ended && milestone > multiplierPeak) {
+    multiplierPeak = milestone;
+    if (intense) {
+      multiplierAnimation?.cancel();
+      multiplierAnimation = $("multiplier").animate([
+        { transform: "translateY(0) scale(1)" },
+        { transform: "translateY(-8px) scale(1.32)", offset: 0.2 },
+        { transform: "translateY(2px) scale(1.1,.88)", offset: 0.4 },
+        { transform: "translateY(-5px) scale(1.2)", offset: 0.6 },
+        { transform: "translateY(0) scale(1)", offset: 1 },
+      ], { duration: 850, easing: "ease-out" });
+    }
+  }
+  if (!intense || s.ended) multiplierAnimation?.cancel();
+  else if (paused) multiplierAnimation?.pause();
+  else if (multiplierAnimation?.playState === "paused") multiplierAnimation.play();
   for (const id of [
     "reaction",
     "temperature",
@@ -357,7 +380,8 @@ function frame(now: number) {
   );
   updateUI();
   render(canvas, s, selected);
-  drawPlant($<HTMLCanvasElement>("plant"), s);
+  if (started && !paused && !s.ended) plantMotion += elapsed;
+  drawPlant($<HTMLCanvasElement>("plant"), s, plantMotion, intense);
   drawEffects(
     $<HTMLCanvasElement>("fx"),
     s,

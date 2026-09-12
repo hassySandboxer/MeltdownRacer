@@ -29,6 +29,25 @@ document.querySelector("#app")!.innerHTML = `
 <section class="panel controls"><div class="panel-heading"><span>OPERATOR CONTROLS</span><span class="dim">手動操作</span></div><div class="rod-heading"><b>制御棒の挿入数</b><output id="rods-value">50%</output></div><input id="rods" type="range" min="0" max="100" value="50" aria-label="制御棒の挿入数"><p class="rod-note" id="rod-count">32 / 64 本・4本ずつ均等に挿入</p><label class="control-label" for="flow">02 <b>冷却水の流量</b><output id="flow-value">42%</output></label><input id="flow" type="range" min="0" max="100" value="42"><div class="range-caption"><span>低流量 / 省電力</span><span>高流量 / 冷却 ↑</span></div><div class="control-label"><b>燃料補給</b><output id="refills">残り 8 / 8 回</output></div><p class="refill-rule">1回で選択区画の灰色燃料を交換・12秒間隔</p><div class="sectors" aria-label="補給区画">${["左上", "右上", "左下", "右下"].map((x, i) => `<button data-sector="${i}" class="${i === 0 ? "selected" : ""}" aria-pressed="${i === 0}">${x}<span id="sector-${i}">0 使用済み</span></button>`).join("")}</div><button id="refill" class="refill" disabled>選択区画を補給 <span>↻</span></button><div id="shop-panel" class="shop-panel" hidden><div><b>⚡ ねんりょう屋さん</b><output id="credits">0 ⚡</output></div><button id="buy-fuel" disabled>補給券 +1　120 ⚡</button><small>1 EU → 1,000 ⚡・購入は何度でも</small><p id="shop-message" role="status">発電で貯めて、補給券を買おう！</p></div><p class="keyboard">A / D 制御棒　 W / S 流量　 R 補給　 Space 停止</p></section></aside></div>
 <dialog id="records-dialog"><button id="records-close">閉じる</button><section class="records panel"><div class="panel-heading"><span>PERSONAL BEST / ローカル記録</span><span class="dim">このブラウザに保存</span></div><div id="records"></div></section></dialog><footer><span>MELTDOWNRACER <b>v0.3</b> / LOCAL EDITION</span><span>架空のアーケードゲームです。実在の原子炉を再現するものではありません。</span></footer></main>
 <canvas id="fx" aria-hidden="true"></canvas><dialog id="help-dialog"><div class="dialog-body"><p class="eyebrow">OPERATOR’S GUIDE</p><h2>熱と連鎖は、別のもの。</h2><p>白い中性子が緑の燃料に当たると、確率で分裂。熱と次の中性子を生みます。灰色の燃料は使用済みです。</p><ol><li><b>制御棒</b>は炉内に均等配置された64個の吸収点です。スライダーで0〜100%を選ぶと、上下左右の対称な4本組で挿入されます。黒い丸が挿入中、薄い丸が未挿入。A/Dキーでも操作できます。挿入すると中性子を吸収します。反応を抑えても、蓄積した熱はすぐには消えません。</li><li><b>冷却水</b>で炉温を下げ、水位を回復。ポンプにも電力が必要なため、流量を上げすぎると正味出力が下がります。</li><li><b>区画を選んで補給</b>すると使用済み燃料を交換。8回まで・12秒間隔で使えます。</li><li>反応 1.8〜15、出力 12 以上を5秒維持して<b>フィーバー</b>。安定倍率は最大3倍、高温倍率は最大2倍です。</li><li>炉温105または圧力100を超えると危険度が上昇。100%で設備破裂。開始20秒後から、低反応かつ炉温30未満が10秒続くと低温停止です。</li></ol><p>∞ショップモードは終了時間なし。発電1 EUごとに1,000⚡を獲得し、120⚡で区画補給券を1枚購入できます。補給の12秒待ち・過熱・低温停止は残ります。累計発電量やスコアは買い物で減りません。</p><p>▶ ×1ボタンで2倍・4倍・8倍の早送り。温度・反応・得点すべて同じ速度で進みます。燃料が減った後の待ち時間にも使えます。演出ボタンで強い光と揺れを抑えられます。</p><p>タブを離れると自動停止します。日替わりは日本時間の日付で共通シードを使用するローカル練習版です。</p><button id="close-help" class="primary">操作室に戻る</button></div></dialog>`;
+// Keep a single set of controls and move only the fever panel on narrow screens.
+const header = document.querySelector("header")!;
+const actions = document.querySelector(".header-actions")!;
+header.insertBefore(document.querySelector("h1")!, actions);
+header.insertBefore(document.querySelector(".session")!, actions);
+document.querySelector(".page-heading")!.remove();
+const topInstruments = document.createElement("div");
+topInstruments.className = "top-instruments";
+const scoreStrip = document.querySelector(".score-strip")!;
+scoreStrip.before(topInstruments);
+topInstruments.append(scoreStrip);
+const feverPanel = document.querySelector(".fever-track")!;
+const mobileLayout = matchMedia("(max-width: 700px)");
+function placeFever() {
+  if (mobileLayout.matches) document.querySelector(".telemetry")!.prepend(feverPanel);
+  else topInstruments.append(feverPanel);
+}
+mobileLayout.addEventListener("change", placeFever);
+placeFever();
 let mode: Mode = "survival",
   s = new Simulation(7391),
   started = false,

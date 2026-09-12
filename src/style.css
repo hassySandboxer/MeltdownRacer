@@ -1485,9 +1485,9 @@ dialog { background: #fff2f5; color: #624768; border-color: #d89bbe; }
   65% { transform: translateY(calc(-.6 * var(--hop))) scale(var(--boost)); }
   85% { transform: translateY(0) scale(var(--boost)); }
 }
-.fever .score-strip label { color: #fff4fb; }
-.fever .score-strip > div:first-child strong { color: #fff1bd; }
-.fever .score-strip strong { color: #fff; }
+.fever:not(.gentle) .score-strip label { color: #fff4fb; }
+.fever:not(.gentle) .score-strip > div:first-child strong { color: #fff1bd; }
+.fever:not(.gentle) .score-strip strong { color: #fff; }
 .fever #multiplier { color: #fff2a1; text-shadow: 1px 2px #954775, 0 0 8px #ff8ad4; }
 @media(max-width:700px) {
   #multiplier { font-size: 16px; }
@@ -1554,3 +1554,76 @@ dialog { background: #fff2f5; color: #624768; border-color: #d89bbe; }
   .mary-cheer { font-size: 14px; }
 }
 @media (prefers-reduced-motion:reduce) { .mary-companion * { animation: none !important; } }
+/* Consolidated header and aligned score / fever instruments. */
+header { height: 64px; gap: 16px; padding: 0 18px; }
+header h1 { font-size: 12px; font-weight: 800; letter-spacing: 0; color: #824569; margin-right: auto; }
+header .session { gap: 7px; }
+header .session strong { font-size: 22px; }
+header .header-actions { flex-shrink: 0; }
+main { height: calc(100dvh - 64px); grid-template-rows: 76px minmax(0,1fr) 12px; }
+.top-instruments { display: grid; grid-template-columns: minmax(0,1fr) 350px; gap: 12px; min-height: 0; }
+.top-instruments .score-strip { min-width: 0; padding: 12px 0; grid-template-columns: 1.15fr .9fr 1fr 1fr; }
+.top-instruments .score-strip > div { padding: 0 10px; }
+.top-instruments .score-strip strong { font-size: 21px; }
+.top-instruments .score-strip label { font-size: 7px; letter-spacing: 0; }
+.top-instruments #multiplier { font-size: 21px; }
+.top-instruments .fever-track { min-width: 0; border: 2px solid #dcb0cb; border-radius: 12px; padding: 8px 10px; background: #f0dfedf2; }
+.top-instruments .fever-track .track { height: 14px; margin-top: 6px; }
+.top-instruments .fever-track p { font-size: 9px; margin-top: 5px; white-space: normal; line-height: 1.35; }
+.fever:not(.gentle) .top-instruments .fever-track { padding: 8px 10px; }
+aside { grid-template-rows: 165px minmax(0,1fr); }
+.reactor-panel { grid-template-rows: 20px minmax(0,1fr) 86px 18px; row-gap: 4px; }
+.core-wrap { align-items: flex-start; justify-content: flex-start; }
+#core { width: min(100cqh, calc(100cqw - 70px)); height: min(100cqh, calc(100cqw - 70px)); }
+.tag-left { display: none; }
+.plant { height: 100%; margin: 0; min-height: 0; grid-template-rows: minmax(0,1fr) 16px; }
+.plant-readout { align-items: center; line-height: 12px; }
+.legend { display: flex; align-items: center; margin: 0; line-height: 14px; gap: 12px; }
+.mary-companion { position: absolute; left: auto; right: 0; bottom: 0; width: 132px; }
+.mary-stage, .mary-sprite { width: 128px; height: 128px; }
+.mary-caption { font-size: 9px; }
+.mary-companion[data-mood="fever"] .mary-sprite { background-image: url('/art/mary-fever-party.png'); animation: mary-hop .55s ease-in-out infinite, mary-party-poses 3.6s steps(1,end) infinite; }
+@keyframes mary-party-poses { 0% { background-position: 0% 50%; } 33.333% { background-position: 50% 50%; } 66.666% { background-position: 100% 50%; } }
+@media (max-height:730px) and (min-width:701px) {
+  aside { grid-template-rows: 145px minmax(0,1fr); }
+  .reactor-panel { grid-template-rows: 18px minmax(0,1fr) 72px 16px; }
+  .mary-companion { width: 110px; }
+  .mary-stage, .mary-sprite { width: 106px; height: 106px; }
+}
+@media (min-width:701px) and (max-width:1000px) {
+  header { gap: 10px; padding: 0 10px; }
+  header h1 { max-width: 150px; font-size: 10px; }
+  header .session > span { display: none; }
+  .top-instruments, .game-layout { grid-template-columns: minmax(0,1fr) 310px; }
+  .top-instruments .score-strip > div { padding: 0 6px; }
+  .top-instruments .score-strip strong, .top-instruments #multiplier { font-size: 18px; }
+}
+@media(max-width:700px) {
+  header { height: 72px; display: grid; grid-template-columns: 1fr auto; grid-template-rows: 32px 30px; gap: 2px 4px; padding: 3px 7px; }
+  header .brand { grid-column: 1; grid-row: 1; }
+  header .header-actions { grid-column: 2; grid-row: 1; }
+  header h1 { grid-column: 1; grid-row: 2; font-size: 8px; }
+  header .session { grid-column: 2; grid-row: 2; justify-content: flex-end; gap: 4px; }
+  header .session strong { font-size: 17px; }
+  header .session button { font-size: 9px; padding: 4px 5px; }
+  main { height: calc(100dvh - 72px); grid-template-rows: 48px minmax(0,1fr) 9px; }
+  .top-instruments { display: block; }
+  .top-instruments .score-strip { height: 48px; padding: 5px 0; }
+  .top-instruments .score-strip > div { padding: 0 6px; }
+  .top-instruments .score-strip label { font-size: 5.5px; }
+  .top-instruments .score-strip strong { font-size: 17px; }
+  .top-instruments #multiplier { font-size: 16px; }
+  aside { grid-template-rows: 1fr; }
+  .reactor-panel { grid-template-rows: 15px minmax(0,1fr) 58px 12px; row-gap: 2px; }
+  .legend { gap: 8px; font-size: 6px; line-height: 10px; }
+  .legend i { width: 4px; height: 4px; margin-right: 2px; }
+  .plant { grid-template-rows: minmax(0,1fr) 12px; }
+  .plant-readout { font-size: 7px; padding: 0 5px; line-height: 10px; }
+  #core { width: min(100cqh, calc(100cqw - 64px)); height: min(100cqh, calc(100cqw - 64px)); }
+  .mary-companion { width: 76px; bottom: 0; right: 0; left: auto; }
+  .mary-stage, .mary-sprite { width: 72px; height: 72px; }
+  .mary-caption { font-size: 6px; padding: 2px; }
+}
+.top-instruments .fever-track p { color: #69506f; }
+.fever:not(.gentle) .top-instruments .fever-track p { color: #24142c; }
+.fever.gentle #multiplier { color: #bd4a88; text-shadow: 1px 2px white; }

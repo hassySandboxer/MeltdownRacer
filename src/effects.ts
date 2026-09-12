@@ -114,11 +114,11 @@ export function drawPlant(canvas: HTMLCanvasElement, s: Simulation, motion: numb
   pipe(483, 536, 37, "#65af91", generation);
   for (let i = 0; i < 9; i++) {
     c.fillStyle = generation > i / 9 ? "#70b796" : "#dfd5e8";
-    c.fillRect(546 + i * 7, 47 - i * 3, 4, 7 + i * 3);
+    c.fillRect(546 + i * 7, 39 - i * 3, 4, 7 + i * 3);
   }
   c.fillStyle = "#5e7567";
   c.font = "9px monospace";
-  c.fillText(Math.round(gross) + " PU", 548, 61);
+  c.fillText(Math.round(gross) + " PU", 548, 60);
   c.restore();
 }
 export function drawEffects(
@@ -142,37 +142,42 @@ export function drawEffects(
           (intense ? 0.9 : 0.35) +
           ")",
       );
-    c.strokeStyle = rainbow;
-    c.lineWidth = intense ? 12 : 4;
-    c.strokeRect(6, 6, w - 12, h - 12);
-    if (intense) {
-      for (let band = 0; band < 7; band++) {
-        c.strokeStyle =
-          "hsla(" + ((hue + (band * 360) / 7) % 360) + ",100%,65%,.16)";
-        c.lineWidth = 12 - band;
-        c.strokeRect(
-          14 + band * 5,
-          14 + band * 5,
-          w - 28 - band * 10,
-          h - 28 - band * 10,
-        );
+    // Draw the game border itself as waves; the browser chrome stays untouched.
+    const border = (inset: number, amplitude: number) => {
+      c.beginPath();
+      for (let edge = 0; edge < 4; edge++) {
+        const length = edge % 2 ? h - inset * 2 : w - inset * 2;
+        const steps = Math.ceil(length / 12);
+        for (let j = 0; j <= steps; j++) {
+          const along = j / steps * length;
+          const wave = Math.sin(along * .035 + t * 3 + edge * 1.7) * amplitude * Math.sin(j / steps * Math.PI);
+          const x = edge === 0 ? inset + along : edge === 1 ? w - inset + wave : edge === 2 ? w - inset - along : inset + wave;
+          const y = edge === 0 ? inset + wave : edge === 1 ? inset + along : edge === 2 ? h - inset + wave : h - inset - along;
+          if (edge === 0 && j === 0) c.moveTo(x, y); else c.lineTo(x, y);
+        }
       }
-      for (let i = 0; i < 36; i++) {
-        const x = i % 2 ? w - 18 - (i % 3) * 9 : 18 + (i % 3) * 9,
-          y = (i * 53 + t * 75) % h,
-          r = 3 + (i % 4);
+      c.closePath();
+      c.stroke();
+    };
+    c.strokeStyle = rainbow;
+    c.lineWidth = intense ? 6 : 3;
+    border(12, intense ? 6 : 0);
+    if (intense) {
+      c.globalAlpha = .3;
+      border(22, 8);
+      c.globalAlpha = 1;
+      const colors = ["#ff78ae", "#ffac62", "#ffe66c", "#71e7ae", "#6ed5ff", "#9c98ff", "#e695ff"];
+      const count = Math.min(120, Math.max(45, Math.round(w * h / 11000)));
+      for (let i = 0; i < count; i++) {
+        const x = ((i * 137.51) % w + Math.sin(t * 1.2 + i) * 26 + w) % w;
+        const y = (i * 83.7 + t * (36 + i % 7 * 8)) % (h + 24) - 12;
         c.save();
         c.translate(x, y);
-        c.rotate(t + i);
-        c.fillStyle = "hsl(" + ((hue + i * 31) % 360) + ",100%,75%)";
-        c.beginPath();
-        for (let j = 0; j < 8; j++) {
-          const a = (j * Math.PI) / 4,
-            rr = j % 2 ? r * 0.3 : r;
-          c.lineTo(Math.cos(a) * rr, Math.sin(a) * rr);
-        }
-        c.closePath();
-        c.fill();
+        c.rotate(t * (1 + i % 3) + i);
+        c.scale(Math.max(.25, Math.abs(Math.cos(t * 2 + i))), 1);
+        c.globalAlpha = .7;
+        c.fillStyle = colors[i % 7];
+        c.fillRect(-3, -5, 4 + i % 3, 7 + i % 5);
         c.restore();
       }
       const glow = c.createRadialGradient(

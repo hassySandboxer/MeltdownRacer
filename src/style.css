@@ -1582,7 +1582,7 @@ aside { grid-template-rows: 165px minmax(0,1fr); }
 .mary-companion { position: absolute; left: auto; right: 0; bottom: 0; width: 132px; }
 .mary-stage, .mary-sprite { width: 128px; height: 128px; }
 .mary-caption { font-size: 9px; }
-.mary-companion[data-mood="fever"] .mary-sprite { background-image: url('/art/mary-fever-party.png'); animation: mary-hop .55s ease-in-out infinite, mary-party-poses 3.6s steps(1,end) infinite; }
+.mary-companion[data-mood="fever"] .mary-sprite { background-image: url('/art/mary-fever-party-v2.png'); animation: mary-hop .55s ease-in-out infinite, mary-party-poses 3.6s steps(1,end) infinite; }
 @keyframes mary-party-poses { 0% { background-position: 0% 50%; } 33.333% { background-position: 50% 50%; } 66.666% { background-position: 100% 50%; } }
 @media (max-height:730px) and (min-width:701px) {
   aside { grid-template-rows: 145px minmax(0,1fr); }

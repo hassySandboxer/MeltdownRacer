@@ -1500,3 +1500,5 @@ dialog { background: #fff2f5; color: #624768; border-color: #d89bbe; }
 .refill-rule, .empty-record { color: #77627f; }
 .page-heading { background: #fff3f5b8; border-radius: 9px; padding: 0 6px; }
 @media(max-width:700px) { .page-heading { padding: 0 2px; } }
+.plant { background: linear-gradient(120deg,#e1f3ee,#f6e6f0); border: 1px solid #cdb7d0; }
+.plant-readout { color: #637589; }

@@ -25,14 +25,14 @@ export function drawPlant(canvas: HTMLCanvasElement, s: Simulation, motion: numb
     gross = Math.max(0, (s.temperature - 22) * 1.8),
     generation = s.tick > 0 && !s.ended ? clamp(gross / 180, 0, 1) : 0;
   c.font = "10px sans-serif";
-  c.fillStyle = "#9fcedb";
+  c.fillStyle = "#78617f";
   c.fillText("冷却水", 12, 12);
   c.fillText("炉 → 蒸気", 225, 12);
   c.fillText("タービン → 発電", 419, 12);
-  c.strokeStyle = "#5ca4b6";
+  c.strokeStyle = "#74aeb6";
   c.lineWidth = 2;
   c.strokeRect(12, 17, 80, 38);
-  c.fillStyle = "#238dab";
+  c.fillStyle = "#9bdedc";
   c.fillRect(14, waterY, 76, 53 - waterY);
   c.beginPath();
   for (let x = 14; x < 91; x++) {
@@ -40,9 +40,9 @@ export function drawPlant(canvas: HTMLCanvasElement, s: Simulation, motion: numb
     if (x === 14) c.moveTo(x, y);
     else c.lineTo(x, y);
   }
-  c.strokeStyle = "#a5f4ff";
+  c.strokeStyle = "#eaffff";
   c.stroke();
-  c.fillStyle = "#ebfbff";
+  c.fillStyle = "#376971";
   c.font = "bold 12px monospace";
   c.fillText(Math.round(s.water) + "%", 36, 43);
   const pipe = (
@@ -52,7 +52,7 @@ export function drawPlant(canvas: HTMLCanvasElement, s: Simulation, motion: numb
     color: string,
     amount: number,
   ) => {
-    c.strokeStyle = "#203e4a";
+    c.strokeStyle = "#d5c9df";
     c.lineWidth = 10;
     c.beginPath();
     c.moveTo(x1, y);
@@ -67,16 +67,16 @@ export function drawPlant(canvas: HTMLCanvasElement, s: Simulation, motion: numb
       c.setLineDash([]);
     }
   };
-  pipe(94, 226, 36, "#5be1ff", s.tick && !s.ended ? s.flow / 100 : 0);
-  c.fillStyle = "#29434b";
+  pipe(94, 226, 36, "#599eb3", s.tick && !s.ended ? s.flow / 100 : 0);
+  c.fillStyle = "#dcd4ee";
   c.fillRect(228, 22, 54, 30);
-  c.fillStyle = s.temperature > 90 ? "#ffa45f" : "#caeb87";
+  c.fillStyle = s.temperature > 90 ? "#b64d63" : "#527c68";
   c.fillText(Math.round(s.temperature) + "", 242, 42);
-  pipe(284, 436, 36, "#dcf5ff", generation);
+  pipe(284, 436, 36, "#fff8ee", generation);
   for (let i = 0; i < Math.ceil(generation * 13); i++) {
     const x = 290 + ((i * 31 + t * (25 + generation * 60)) % 140),
       y = 33 - Math.sin(i + t * 2) * 6;
-    c.fillStyle = "#d6f7ff60";
+    c.fillStyle = "#a38bbc65";
     c.beginPath();
     c.arc(x, y, 3 + generation * 3, 0, Math.PI * 2);
     c.fill();
@@ -106,17 +106,17 @@ export function drawPlant(canvas: HTMLCanvasElement, s: Simulation, motion: numb
     c.lineTo(4, 4);
     c.fill();
   }
-  c.fillStyle = "#0d2730";
+  c.fillStyle = "#fff1f2";
   c.beginPath();
   c.arc(0, 0, 5, 0, Math.PI * 2);
   c.fill();
   c.restore();
-  pipe(483, 536, 37, "#cdff83", generation);
+  pipe(483, 536, 37, "#65af91", generation);
   for (let i = 0; i < 9; i++) {
-    c.fillStyle = generation > i / 9 ? "#c5f57a" : "#25444c";
+    c.fillStyle = generation > i / 9 ? "#70b796" : "#dfd5e8";
     c.fillRect(546 + i * 7, 47 - i * 3, 4, 7 + i * 3);
   }
-  c.fillStyle = "#dbf6bc";
+  c.fillStyle = "#5e7567";
   c.font = "9px monospace";
   c.fillText(Math.round(gross) + " PU", 548, 61);
   c.restore();

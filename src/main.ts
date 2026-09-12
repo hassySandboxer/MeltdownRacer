@@ -365,7 +365,7 @@ function frame(now: number) {
     blastStart < 0 || now - blastStart > 1200,
   );
   updateUI();
-  render(canvas, s, selected);
+  render(canvas, s, selected, intense);
   if (started && !paused && !s.ended) plantMotion += elapsed;
   drawPlant($<HTMLCanvasElement>("plant"), s, plantMotion, intense);
   drawEffects(

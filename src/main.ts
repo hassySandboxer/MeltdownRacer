@@ -34,8 +34,6 @@ let mode: Mode = "survival",
   paused = false,
   selected = 0,
   runDate = japanDate();
-let multiplierPeak = 1;
-let multiplierAnimation: Animation | undefined;
 let plantMotion = 0;
 let speed = 1,
   blastStart = -1,
@@ -104,8 +102,6 @@ function start() {
   paused = false;
   accumulator = 0;
   speed = 1;
-  multiplierPeak = 1;
-  multiplierAnimation?.cancel();
   plantMotion = 0;
   blastStart = -1;
   resultShown = false;
@@ -240,23 +236,13 @@ function updateUI() {
   $("power").textContent = s.power.toFixed(0);
   $("energy").textContent = s.energy.toFixed(3);
   $("multiplier").textContent = `×${s.multiplier.toFixed(2)}`;
-  const milestone = Math.floor(s.multiplier + 1e-8);
-  if (started && !paused && !s.ended && milestone > multiplierPeak) {
-    multiplierPeak = milestone;
-    if (intense) {
-      multiplierAnimation?.cancel();
-      multiplierAnimation = $("multiplier").animate([
-        { transform: "translateY(0) scale(1)" },
-        { transform: "translateY(-8px) scale(1.32)", offset: 0.2 },
-        { transform: "translateY(2px) scale(1.1,.88)", offset: 0.4 },
-        { transform: "translateY(-5px) scale(1.2)", offset: 0.6 },
-        { transform: "translateY(0) scale(1)", offset: 1 },
-      ], { duration: 850, easing: "ease-out" });
-    }
-  }
-  if (!intense || s.ended) multiplierAnimation?.cancel();
-  else if (paused) multiplierAnimation?.pause();
-  else if (multiplierAnimation?.playState === "paused") multiplierAnimation.play();
+  const level = Math.max(0, Math.min(5, s.multiplier - 1));
+  const multiplier = $("multiplier");
+  multiplier.style.setProperty("--boost", String(1 + level * 0.07));
+  multiplier.style.setProperty("--hop", `${2 + level * 1.8}px`);
+  multiplier.style.setProperty("--bounce-duration", `${900 - level * 60}ms`);
+  multiplier.classList.toggle("bouncing", started && !s.ended && intense && level > 0);
+  multiplier.style.animationPlayState = paused ? "paused" : "running";
   for (const id of [
     "reaction",
     "temperature",

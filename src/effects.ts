@@ -122,24 +122,65 @@ export function drawEffects(
   paused: boolean,
 ) {
   const { c, w, h } = context(canvas);
-  if (!s.ended && s.multiplier >= 2 && s.tick > 0 && !paused) {
-    const pulse = intense ? 0.13 + 0.12 * Math.sin(s.time * Math.PI * 3) : 0.07;
-    const color = s.multiplier >= 4 ? "255,171,83" : "185,255,113";
-    const g = c.createRadialGradient(
-      w / 2,
-      h / 2,
-      Math.min(w, h) * 0.25,
-      w / 2,
-      h / 2,
-      Math.max(w, h) * 0.7,
-    );
-    g.addColorStop(0, `rgba(${color},0)`);
-    g.addColorStop(1, `rgba(${color},${pulse})`);
-    c.fillStyle = g;
-    c.fillRect(0, 0, w, h);
-    c.strokeStyle = `rgba(${color},${intense ? 0.5 + pulse : 0.3})`;
-    c.lineWidth = 5;
-    c.strokeRect(3, 3, w - 6, h - 6);
+  if (!s.ended && s.fever > 0 && s.tick > 0 && !paused) {
+    const t = performance.now() / 1000;
+    const hue = intense ? (t * 100) % 360 : 310;
+    const rainbow = c.createLinearGradient(0, 0, w, h);
+    for (let i = 0; i <= 7; i++)
+      rainbow.addColorStop(
+        i / 7,
+        "hsla(" +
+          ((hue + (i * 360) / 7) % 360) +
+          ",100%,65%," +
+          (intense ? 0.9 : 0.35) +
+          ")",
+      );
+    c.strokeStyle = rainbow;
+    c.lineWidth = intense ? 12 : 4;
+    c.strokeRect(6, 6, w - 12, h - 12);
+    if (intense) {
+      for (let band = 0; band < 7; band++) {
+        c.strokeStyle =
+          "hsla(" + ((hue + (band * 360) / 7) % 360) + ",100%,65%,.16)";
+        c.lineWidth = 12 - band;
+        c.strokeRect(
+          14 + band * 5,
+          14 + band * 5,
+          w - 28 - band * 10,
+          h - 28 - band * 10,
+        );
+      }
+      for (let i = 0; i < 36; i++) {
+        const x = i % 2 ? w - 18 - (i % 3) * 9 : 18 + (i % 3) * 9,
+          y = (i * 53 + t * 75) % h,
+          r = 3 + (i % 4);
+        c.save();
+        c.translate(x, y);
+        c.rotate(t + i);
+        c.fillStyle = "hsl(" + ((hue + i * 31) % 360) + ",100%,75%)";
+        c.beginPath();
+        for (let j = 0; j < 8; j++) {
+          const a = (j * Math.PI) / 4,
+            rr = j % 2 ? r * 0.3 : r;
+          c.lineTo(Math.cos(a) * rr, Math.sin(a) * rr);
+        }
+        c.closePath();
+        c.fill();
+        c.restore();
+      }
+      const glow = c.createRadialGradient(
+        w / 2,
+        h / 2,
+        Math.min(w, h) * 0.35,
+        w / 2,
+        h / 2,
+        Math.max(w, h) * 0.65,
+      );
+      glow.addColorStop(0, "transparent");
+      glow.addColorStop(1, "hsla(" + hue + ",100%,60%,.27)");
+      c.fillStyle = glow;
+      c.fillRect(0, 0, w, h);
+    }
   }
   if (blast < 0 || blast > 3.1) return;
   const t = blast,

@@ -914,3 +914,484 @@ dialog h2 {
     scroll-behavior: auto !important;
   }
 }
+/* v0.3: candy-colored control room, with serious, legible instruments. */
+:root {
+  --lime: #a9f3d0;
+  --line: #54496f;
+  --muted: #b6aacb;
+  font-family: "Arial Rounded MT Bold", "Yu Gothic UI", Meiryo, sans-serif;
+  background: #19142a;
+}
+body {
+  background:
+    radial-gradient(ellipse at 22% 10%, #4c3158, transparent 60%),
+    radial-gradient(ellipse at 85% 90%, #25355c, transparent 60%), #19142a;
+}
+header {
+  background: #231c35;
+  border-color: #72516d;
+}
+.brand {
+  gap: 8px;
+}
+.brand-orbit {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 11px;
+  background: #ff9ac7;
+  color: #fff4b0;
+  box-shadow: 3px 3px 0 #ae5990;
+  transform: rotate(-10deg);
+  font-size: 25px;
+}
+.pop-logo {
+  font-size: 16px;
+  font-weight: 1000;
+  line-height: 1.1;
+  color: #fff2fb;
+  text-shadow: 2px 2px #b65290;
+  letter-spacing: 0;
+}
+.brand .pop-logo small {
+  display: block;
+  font-size: 10px;
+  color: #ffce69;
+  letter-spacing: 2px;
+}
+.pop-logo small span,
+.title-logo small span {
+  color: #fff597;
+  text-shadow: 0 0 10px #ffcf48;
+}
+.title-logo {
+  color: #fff0ff !important;
+  text-shadow:
+    3px 3px 0 #bd4c8c,
+    5px 5px 0 #643778;
+  letter-spacing: -1px;
+  font-weight: 1000 !important;
+  font-size: 32px !important;
+  transform: rotate(-3deg);
+  padding: 5px 0;
+}
+.title-logo small {
+  display: block;
+  font-size: 22px !important;
+  letter-spacing: 3px;
+  color: #ffd28d;
+}
+.overlay {
+  border: 2px solid #ec9ac8;
+  background: linear-gradient(150deg, #442a50f8, #211e39fb);
+  box-shadow:
+    0 15px 60px #09031599,
+    5px 5px 0 #9a597a44;
+  border-radius: 22px;
+}
+.overlay .eyebrow {
+  color: #f9bad8;
+  font-size: 8px;
+  letter-spacing: 1px;
+}
+.overlay .primary {
+  background: linear-gradient(110deg, #ffc795, #ff9dce);
+  color: #4a284e;
+  border-bottom: 3px solid #b65d91;
+  border-radius: 12px;
+}
+.mode-select button {
+  padding: 8px 3px;
+  font-size: 10px;
+  border-radius: 10px;
+}
+.mode-select button.selected {
+  background: #c997dd38;
+  border-color: #f7bddf;
+  color: #fff3c2;
+}
+.mascot {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  color: #ddffb8;
+  background: #332b4c;
+  border: 3px solid #b5e6cc;
+  border-radius: 45% 45% 40% 40%;
+  width: 58px;
+  height: 45px;
+  font-size: 24px;
+  font-weight: 800;
+  box-shadow: 0 0 0 5px #a8f9d519;
+  transform: rotate(6deg);
+  margin: 7px 0;
+}
+.mascot span {
+  position: absolute;
+  right: -12px;
+  top: -8px;
+  color: #ff9bb9;
+  font-size: 18px;
+}
+.panel,
+.reactor-panel {
+  background: #221f37dd;
+  border-color: #605176;
+  border-radius: 14px;
+}
+.score-strip {
+  background: linear-gradient(120deg, #34243f, #272840);
+  border-color: #705578;
+  border-radius: 13px;
+}
+.score-strip > div:first-child strong {
+  color: #ffd095;
+}
+.score-strip label {
+  color: #ddbdd7;
+}
+.page-heading h1 {
+  font-size: 15px;
+  color: #e7bfda;
+  letter-spacing: 1px;
+}
+.primary,
+button {
+  border-radius: 9px;
+}
+button {
+  background: #3b304c;
+  border-color: #72547d;
+}
+button:hover:enabled {
+  background: #604068;
+}
+button.selected {
+  color: #ffefc0;
+  border-color: #ffbbd5;
+  background: #a56b9636;
+}
+.rod-heading {
+  color: #ffcee3;
+}
+.rod-heading output {
+  color: #a9f3d0;
+  font: 13px monospace;
+}
+.rod-array {
+  display: grid;
+  grid-template-columns: repeat(16, 1fr);
+  gap: 3px;
+  padding: 5px 2px;
+}
+.rod-array i {
+  display: block;
+  aspect-ratio: 1;
+  border: 1px solid #887693;
+  border-radius: 50%;
+  background: #847ca124;
+  max-height: 9px;
+}
+.rod-array i.inserted {
+  background: #11111d;
+  border-color: #eea5d0;
+  box-shadow: 0 0 3px #ec94d14d;
+}
+.rod-note {
+  font-size: 9px;
+  margin: 0 0 7px;
+  color: #bdb2ce;
+}
+.shop-panel {
+  margin-top: auto;
+  background: #ffb9d31a;
+  border: 1px solid #c08aac;
+  border-radius: 9px;
+  padding: 7px;
+  display: grid;
+  gap: 4px;
+}
+.shop-panel[hidden] {
+  display: none;
+}
+.shop-panel > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: #ffd9a1;
+}
+.shop-panel output {
+  font: 13px monospace;
+  color: #ffee9c;
+}
+.shop-panel button {
+  background: #e8b2d2;
+  color: #3e2347;
+  font-weight: 700;
+  font-size: 11px;
+  padding: 7px;
+}
+.shop-panel small {
+  font-size: 8px;
+  color: #c7b7d6;
+}
+.shop-panel p {
+  font-size: 8px;
+  color: #f4d7e5;
+  margin: 0;
+}
+.controls {
+  gap: 6px;
+}
+.fever:not(.gentle) .score-strip {
+  background: linear-gradient(
+    100deg,
+    #8f386d,
+    #664eaa,
+    #326d8d,
+    #388567,
+    #8a783c,
+    #8a543c,
+    #8f386d
+  );
+  background-size: 350% 100%;
+  animation: candy-flow 3s linear infinite;
+  border-color: #ffe7ac;
+  box-shadow: 0 0 17px #ff9ce06b;
+}
+.fever:not(.gentle) .reactor-panel {
+  animation: candy-border 4s linear infinite;
+}
+.fever:not(.gentle) .fever-track {
+  background: linear-gradient(
+    100deg,
+    #ff5fab,
+    #ffc75d,
+    #e8ff73,
+    #74ffc3,
+    #69d5ff,
+    #a196ff,
+    #f692ff
+  );
+  background-size: 250% 100%;
+  animation: candy-flow 2.5s linear infinite;
+  border-radius: 8px;
+  padding: 4px 7px;
+}
+.fever:not(.gentle) .fever-track p,
+.fever:not(.gentle) .fever-track > div:first-child {
+  color: #24142c;
+  font-weight: 900;
+}
+.fever .multiplier strong {
+  color: #fff4b0;
+  text-shadow: 0 0 12px #ff8de4;
+}
+.fever .fever-track strong {
+  font-size: 13px;
+}
+.plant {
+  background: #191b2e;
+  border-color: #5c617e;
+}
+.range-caption,
+.meter label {
+  color: #c6c1da;
+}
+.fever-track p {
+  color: #c5b3d1;
+}
+dialog {
+  background: #2e2440;
+  border-color: #bf83ab;
+  border-radius: 18px;
+}
+footer {
+  color: #a499b8;
+}
+.brand:focus-visible {
+  outline-offset: 1px;
+}
+@keyframes candy-flow {
+  to {
+    background-position: 350% 0;
+  }
+}
+@keyframes candy-border {
+  0%,
+  100% {
+    border-color: #ff8acc;
+    box-shadow: inset 0 0 25px #ff88ca33;
+  }
+  25% {
+    border-color: #f5ea82;
+    box-shadow: inset 0 0 25px #f5ea8233;
+  }
+  50% {
+    border-color: #81ffce;
+    box-shadow: inset 0 0 25px #81ffce33;
+  }
+  75% {
+    border-color: #8aaeff;
+    box-shadow: inset 0 0 25px #8aaeff33;
+  }
+}
+@media (max-width: 700px) {
+  .brand-orbit {
+    width: 22px;
+    height: 24px;
+    font-size: 18px;
+    border-radius: 7px;
+  }
+  .pop-logo {
+    font-size: 12px;
+  }
+  .brand .pop-logo small {
+    font-size: 8px;
+    letter-spacing: 1px;
+  }
+  .brand {
+    gap: 5px;
+  }
+  .header-actions button {
+    font-size: 8px;
+    padding: 5px;
+  }
+  .page-heading h1 {
+    font-size: 10px;
+    letter-spacing: 0;
+  }
+  .title-logo {
+    font-size: 27px !important;
+  }
+  .title-logo small {
+    font-size: 17px !important;
+  }
+  .mascot {
+    width: 44px;
+    height: 34px;
+    font-size: 19px;
+    margin: 2px 0;
+  }
+  .rod-array {
+    padding: 3px 1px;
+    gap: 2px;
+  }
+  .rod-array i {
+    max-height: 7px;
+  }
+  .rod-note {
+    font-size: 7px;
+    margin: 0 0 2px;
+  }
+  .controls {
+    gap: 4px;
+  }
+  .endless .game-layout {
+    grid-template-rows: minmax(0, 1fr) 270px;
+  }
+  .shop-panel {
+    padding: 4px;
+    gap: 2px;
+  }
+  .shop-panel > div {
+    font-size: 9px;
+  }
+  .shop-panel output {
+    font-size: 10px;
+  }
+  .shop-panel button {
+    font-size: 9px;
+    padding: 4px;
+  }
+  .shop-panel small {
+    font-size: 6px;
+  }
+  .shop-panel p {
+    font-size: 7px;
+  }
+  .fever .fever-track strong {
+    font-size: 9px;
+  }
+  .fever:not(.gentle) .fever-track {
+    padding: 2px 4px;
+  }
+  .mode-select button {
+    font-size: 9px;
+    padding: 7px 2px;
+  }
+}
+@media (max-height: 740px) {
+  .overlay .mascot {
+    display: none;
+  }
+  .title-logo {
+    font-size: 27px !important;
+  }
+  .title-logo small {
+    font-size: 17px !important;
+  }
+  .controls {
+    gap: 4px;
+  }
+  .rod-note {
+    margin-bottom: 2px;
+  }
+  .shop-panel {
+    padding: 4px;
+    gap: 2px;
+  }
+  .shop-panel button {
+    padding: 5px;
+  }
+  .shop-panel p {
+    font-size: 7px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fever .score-strip,
+  .fever .reactor-panel,
+  .fever .fever-track {
+    animation: none !important;
+  }
+}
+.endless .sectors {
+  grid-template-columns: repeat(4, 1fr);
+}
+.endless .sectors button {
+  display: block;
+  text-align: center;
+  padding: 4px 2px;
+}
+.endless .sectors button span {
+  display: block;
+}
+.rod-array {
+  gap: 2px;
+  padding: 3px 2px;
+}
+.rod-array i {
+  max-height: 5px;
+}
+.endless .controls {
+  gap: 4px;
+}
+.endless .shop-panel {
+  margin-top: 5px;
+}
+.endless .shop-panel small {
+  font-size: 7px;
+}
+@media (max-width: 700px) {
+  .endless .controls {
+    gap: 3px;
+  }
+  .rod-array i {
+    max-height: 4px;
+  }
+  .endless .shop-panel {
+    margin-top: 2px;
+  }
+}

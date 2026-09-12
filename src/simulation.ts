@@ -1,5 +1,6 @@
 import { C, clamp, VERSION, CONFIG_VERSION } from "./config";
-export type Mode = "survival" | "daily";
+import { ROD_SITES, insertedRodCount } from "./rods";
+export type Mode = "survival" | "daily" | "endless";
 export type Fuel = {
   x: number;
   y: number;
@@ -17,7 +18,7 @@ export type Neutron = {
 export type Input = {
   tick: number;
   rods?: number;
-  rod?: { index: number; depth: number };
+  buyFuel?: boolean;
   flow?: number;
   refill?: number;
 };
@@ -30,10 +31,9 @@ export type Replay = {
 };
 export class Simulation {
   tick = 0;
-  rodDepths = [60, 60, 60, 60];
-  get rods() {
-    return this.rodDepths.reduce((a, b) => a + b, 0) / 4;
-  }
+  rods = 50;
+  credits = 0;
+  purchases = 0;
   flow = 42;
   temperature = 32;
   waterTemp = 20;
@@ -111,14 +111,13 @@ export class Simulation {
   }
   input(action: Omit<Input, "tick">) {
     if (this.ended) return false;
-    if (
-      action.rod &&
-      (!Number.isInteger(action.rod.index) ||
-        action.rod.index < 0 ||
-        action.rod.index > 3 ||
-        !Number.isFinite(action.rod.depth))
-    )
-      return false;
+    if (action.buyFuel && action.refill !== undefined) return false;
+    if (action.buyFuel) {
+      if (this.mode !== "endless" || this.credits < C.fuelPrice) return false;
+      this.credits -= C.fuelPrice;
+      this.refills++;
+      this.purchases++;
+    }
     if (action.refill !== undefined) {
       if (
         !Number.isInteger(action.refill) ||
@@ -140,23 +139,18 @@ export class Simulation {
       this.cooldown = C.refillCooldown;
     }
     if (action.rods !== undefined && Number.isFinite(action.rods))
-      this.rodDepths.fill(clamp(action.rods));
-    if (action.rod) this.rodDepths[action.rod.index] = clamp(action.rod.depth);
+      this.rods = clamp(action.rods);
     if (action.flow !== undefined && Number.isFinite(action.flow))
       this.flow = clamp(action.flow);
     this.replay.inputs.push({
       ...action,
-      ...(action.rod ? { rod: { ...action.rod } } : {}),
       tick: this.tick,
     });
     return true;
   }
-  rodRects() {
-    return [-135, -45, 45, 135].map((x, i) => {
-      const depth = this.rodDepths[i] / 100;
-      const top = -Math.sqrt(C.radius ** 2 - x ** 2);
-      return { x: x - 7, y: top, w: 14, h: depth * (-top * 2) };
-    });
+  rodSites() {
+    const count = insertedRodCount(this.rods);
+    return ROD_SITES.map((r, i) => ({ ...r, active: i < count }));
   }
   private emit(x: number, y: number) {
     // Shared gameplay limit: excess neutrons escape, on every device equally.
@@ -188,7 +182,7 @@ export class Simulation {
         this.emit(f.x - 8, f.y);
       }
     }
-    const rods = this.rodRects();
+    const rods = this.rodSites().filter((r) => r.active);
     const current = this.neutrons;
     this.neutrons = [];
     for (const n of current) {
@@ -201,7 +195,11 @@ export class Simulation {
         this.escaped++;
         continue;
       }
-      if (rods.some((r) => r.h > 0 && segmentRect(ox, oy, n.x, n.y, r))) {
+      if (
+        rods.some(
+          (r) => distanceToSegment(r.x, r.y, ox, oy, n.x, n.y) <= C.rodRadius,
+        )
+      ) {
         this.absorbed++;
         continue;
       }
@@ -290,7 +288,9 @@ export class Simulation {
       ? 1 + clamp((this.temperature - 75) / 30, 0, 1)
       : 1;
     this.multiplier = stableBonus * riskBonus;
-    this.energy += (Math.max(0, this.power) * dt) / 3600;
+    const generated = (Math.max(0, this.power) * dt) / 3600;
+    this.energy += generated;
+    if (this.mode === "endless") this.credits += generated * C.creditsPerEU;
     this.score += Math.max(0, this.power) * this.multiplier * dt;
     const hazard = Math.max(this.temperature - 105, this.pressure - 100);
     this.danger = clamp(
@@ -331,31 +331,6 @@ export function distanceToSegment(
     1,
   );
   return Math.hypot(x - ax - t * dx, y - ay - t * dy);
-}
-export function segmentRect(
-  ax: number,
-  ay: number,
-  bx: number,
-  by: number,
-  r: { x: number; y: number; w: number; h: number },
-) {
-  let lo = 0,
-    hi = 1;
-  for (const [a, d, min, max] of [
-    [ax, bx - ax, r.x, r.x + r.w],
-    [ay, by - ay, r.y, r.y + r.h],
-  ]) {
-    if (d === 0) {
-      if (a < min || a > max) return false;
-    } else {
-      const t1 = (min - a) / d,
-        t2 = (max - a) / d;
-      lo = Math.max(lo, Math.min(t1, t2));
-      hi = Math.min(hi, Math.max(t1, t2));
-      if (lo > hi) return false;
-    }
-  }
-  return true;
 }
 export function playReplay(replay: Replay, ticks: number) {
   if (replay.version !== VERSION || replay.configVersion !== CONFIG_VERSION)

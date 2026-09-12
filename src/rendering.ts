@@ -107,17 +107,18 @@ export function render(
       ctx.fillRect(f.x - 1, f.y - 2, 2, 2);
     }
   }
-  for (const r of s.rodRects()) {
-    if (!r.h) continue;
-    ctx.fillStyle = "#779095";
-    ctx.fillRect(r.x, r.y, r.w, r.h);
-    ctx.fillStyle = "#bac8bd";
-    ctx.fillRect(r.x + 2, r.y, 3, r.h);
-    ctx.fillStyle = "#eeb66b";
-    ctx.fillRect(r.x, r.y + r.h - 6, r.w, 6);
-    ctx.fillStyle = "#243b44";
-    for (let y = r.y + 8; y < r.y + r.h - 6; y += 12)
-      ctx.fillRect(r.x + 7, y, 6, 3);
+  for (const r of s.rodSites()) {
+    ctx.beginPath();
+    ctx.arc(r.x, r.y, C.rodRadius, 0, Math.PI * 2);
+    ctx.fillStyle = r.active ? "#10101d" : "#8493a526";
+    ctx.fill();
+    ctx.strokeStyle = r.active ? "#f49ad1" : "#9ebbd348";
+    ctx.lineWidth = r.active ? 1.5 : 0.7;
+    ctx.stroke();
+    if (r.active) {
+      ctx.fillStyle = "#f0b2da";
+      ctx.fillRect(r.x - 2, r.y - 2, 4, 4);
+    }
   }
   ctx.lineWidth = 1;
   for (const n of s.neutrons) {
@@ -136,10 +137,4 @@ export function render(
     ctx.fillRect(-240, -240, 480, 480);
   }
   ctx.restore();
-  s.rodRects().forEach((r, i) => {
-    ctx.fillStyle = "#edc98b";
-    ctx.font = "bold 13px monospace";
-    ctx.textAlign = "center";
-    ctx.fillText(String(i + 1), r.x + 7, r.y - 9);
-  });
 }

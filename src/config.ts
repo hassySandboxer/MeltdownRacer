@@ -1,6 +1,6 @@
 // All values are fictional arcade units, not real reactor operating conditions.
-export const VERSION = "0.2.0";
-export const CONFIG_VERSION = 2;
+export const VERSION = "0.3.0";
+export const CONFIG_VERSION = 3;
 export const C = {
   dt: 1 / 60,
   radius: 235,
@@ -18,6 +18,9 @@ export const C = {
   refills: 8,
   refillCooldown: 12,
   dailySeconds: 300,
+  rodRadius: 7.5,
+  fuelPrice: 120,
+  creditsPerEU: 1000,
 } as const;
 export const clamp = (n: number, lo = 0, hi = 100) =>
   Math.max(lo, Math.min(hi, n));

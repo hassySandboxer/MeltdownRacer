@@ -94,6 +94,9 @@ export class Simulation {
         this.fuel.push(f);
       }
   }
+  get fuelPrice() {
+    return C.fuelPrice + this.purchases * C.fuelPriceStep;
+  }
   get time() {
     return this.tick * C.dt;
   }
@@ -113,8 +116,8 @@ export class Simulation {
     if (this.ended) return false;
     if (action.buyFuel && action.refill !== undefined) return false;
     if (action.buyFuel) {
-      if (this.mode !== "endless" || this.credits < C.fuelPrice) return false;
-      this.credits -= C.fuelPrice;
+      if (this.mode !== "endless" || this.credits < this.fuelPrice) return false;
+      this.credits -= this.fuelPrice;
       this.refills++;
       this.purchases++;
     }

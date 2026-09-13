@@ -8,7 +8,7 @@ for (let seed = 1; seed <= 5; seed++) {
         rods: s.temperature > 85 ? 90 : s.temperature < 50 ? 25 : 60,
         flow: s.temperature > 85 ? 90 : s.temperature < 45 ? 25 : 50,
       });
-      if (s.refills < 2 && s.credits >= C.fuelPrice) s.input({ buyFuel: true });
+      if (s.refills < 2 && s.credits >= s.fuelPrice) s.input({ buyFuel: true });
       if (s.cooldown === 0 && s.refills > 0) {
         const counts = [0, 1, 2, 3].map(
           (i) => s.fuel.filter((f) => f.sector === i && f.spent).length,

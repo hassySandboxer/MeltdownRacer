@@ -1518,7 +1518,7 @@ dialog { background: #fff2f5; color: #624768; border-color: #d89bbe; }
 .mary-companion { position: fixed; left: max(8px, calc((100vw - 1050px) / 2 - 180px)); bottom: 28px; width: 164px; z-index: 3; pointer-events: none; color: #745477; }
 .mary-caption { position: relative; z-index: 1; border: 1px solid #d7a9c6; border-radius: 12px; background: #fff6efef; padding: 5px 7px; font-size: 10px; font-weight: 800; text-align: center; box-shadow: 0 3px 0 #dca7c833; }
 .mary-stage { height: 160px; position: relative; overflow: visible; }
-.mary-sprite { width: 160px; height: 160px; background: url('/art/mary-worker-states.png') 0 50% / 300% 100%; border-radius: 28%; transform-origin: 50% 90%; animation: mary-idle 4s ease-in-out infinite; }
+.mary-sprite { width: 160px; height: 160px; background: url('/art/mary-worker-states-transparent.png') 0 50% / 300% 100%; border-radius: 28%; transform-origin: 50% 90%; animation: mary-idle 4s ease-in-out infinite; }
 .mary-console { display: flex; gap: 3px; padding: 5px 6px; border: 2px solid #c2a6c6; border-radius: 10px; background: linear-gradient(#f5e8f3,#dddfef); box-shadow: 0 4px 0 #b7aac6; margin-top: -5px; position: relative; }
 .mary-dial { flex: 1; min-width: 0; text-align: center; font-size: 8px; font-weight: 800; }
 .mary-dial svg { display: block; width: 100%; }
@@ -1582,7 +1582,7 @@ aside { grid-template-rows: 165px minmax(0,1fr); }
 .mary-companion { position: absolute; left: auto; right: 0; bottom: 0; width: 132px; }
 .mary-stage, .mary-sprite { width: 128px; height: 128px; }
 .mary-caption { font-size: 9px; }
-.mary-companion[data-mood="fever"] .mary-sprite { background-image: url('/art/mary-fever-party-v2.png'); animation: mary-hop .55s ease-in-out infinite, mary-party-poses 3.6s steps(1,end) infinite; }
+.mary-companion[data-mood="fever"] .mary-sprite { background-image: url('/art/mary-fever-party-v2-transparent.png'); animation: mary-hop .55s ease-in-out infinite, mary-party-poses 3.6s steps(1,end) infinite; }
 @keyframes mary-party-poses { 0% { background-position: 0% 50%; } 33.333% { background-position: 50% 50%; } 66.666% { background-position: 100% 50%; } }
 @media (max-height:730px) and (min-width:701px) {
   aside { grid-template-rows: 145px minmax(0,1fr); }
@@ -1627,3 +1627,27 @@ aside { grid-template-rows: 165px minmax(0,1fr); }
 .top-instruments .fever-track p { color: #69506f; }
 .fever:not(.gentle) .top-instruments .fever-track p { color: #24142c; }
 .fever.gentle #multiplier { color: #bd4a88; text-shadow: 1px 2px white; }
+/* Larger mascot; keep the pose entirely inside the reactor's lower-right corner. */
+.mary-companion { width: min(218px, calc(100cqh - 34px)); }
+.mary-stage { width: 100%; height: auto; aspect-ratio: 1; }
+.mary-sprite { width: 100%; height: 100%; border-radius: 0; }
+@media(max-height:730px) and (min-width:701px) { .mary-companion { width: min(180px, calc(100cqh - 34px)); } }
+@media(max-width:700px) { .mary-companion { width: min(112px, calc(100cqh - 28px)); } }
+
+/* Transparent artwork and cartoon aftermath. */
+.mary-stage { background: transparent; box-shadow: none; }
+.mary-companion[data-mood="soot"] .mary-sprite { background-image: url('/art/mary-soot.png'); background-size: contain; background-position: center; background-repeat: no-repeat; animation: mary-cough 1.8s infinite; }
+.soot-puff { display: none; position: absolute; left: 49%; top: 37%; width: 9%; height: 6%; background: #3d3540; border-radius: 50%; box-shadow: 4px -3px #49414b, -3px -2px #49414b; pointer-events: none; }
+[data-mood="soot"] .soot-puff { display: block; animation: soot-breath 1.8s ease-out infinite; }
+[data-mood="soot"] .soot-puff.second { animation-delay: .25s; }
+@keyframes soot-breath { 0%, 12% { opacity: 0; transform: scale(.3); } 20% { opacity: .8; } 85%,100% { opacity: 0; transform: translate(-32px,-28px) scale(1.9); } }
+@keyframes mary-cough { 0%, 12%, 28%, 100% { transform: rotate(0); } 18%, 24% { transform: rotate(-3deg) translateY(2px); } }
+.ready-call { position: absolute; inset: 25% 0 auto; z-index: 8; text-align: center; font-family: inherit; font-size: clamp(30px,6vw,72px); font-weight: 900; color: #bc4d91; text-shadow: 3px 3px white,-3px -3px white,0 5px 16px #ffd255; pointer-events: none; }
+.ready-call.go { color: #e58b30; transform: scale(1.08) rotate(-3deg); }
+.next-mode-label { font-size: 11px; }
+#next-mode { width: 100%; padding: 7px 10px; border: 1px solid #dba6c7; border-radius: 12px; background: #fff1f8; color: #654a72; font: inherit; font-size: 12px; }
+
+/* Leave the mascot visible alongside the result card. */
+.overlay.result { left: 0; width: calc(100% - 180px); transform: translateY(-50%); padding: 12px; }
+@media(min-height:731px) and (min-width:701px) { .overlay.result { width: calc(100% - 218px); } }
+@media(max-width:700px) { .overlay.result { width: calc(100% - 112px); padding: 7px; } .overlay.result .result-stats { gap: 5px; } }

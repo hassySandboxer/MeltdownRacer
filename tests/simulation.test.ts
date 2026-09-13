@@ -193,3 +193,31 @@ test("daily run clears at five minutes", () => {
   assert.ok(s.ended);
   assert.match(s.reason, /クリア/);
 });
+
+test("shop price rises only after successful purchases and resets each run", () => {
+  const s = new Simulation(9, "endless");
+  s.credits = 120;
+  assert.equal(s.fuelPrice, 120);
+  assert.equal(s.input({buyFuel:true}), true);
+  assert.equal(s.fuelPrice, 135);
+  s.credits = 120;
+  assert.equal(s.input({buyFuel:true}), false);
+  assert.equal(s.fuelPrice, 135);
+  assert.equal(s.credits, 120);
+  s.credits = 285;
+  assert.equal(s.input({buyFuel:true}), true);
+  assert.equal(s.fuelPrice, 150);
+  assert.equal(s.input({buyFuel:true}), true);
+  assert.equal(s.credits, 0);
+  assert.equal(s.fuelPrice, 165);
+  assert.equal(new Simulation(9,"endless").fuelPrice, 120);
+});
+test("multiple rising-price purchases replay exactly", () => {
+  const s = new Simulation(3,"endless");
+  for (let i=0;i<6000 && !s.ended;i++) {
+    if (s.credits >= s.fuelPrice) s.input({buyFuel:true});
+    s.step();
+  }
+  assert.ok(s.purchases >= 2);
+  assert.deepEqual(playReplay(s.replay,s.tick),s);
+});

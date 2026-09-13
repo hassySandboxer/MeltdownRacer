@@ -65,3 +65,11 @@
 - 黄色の☢Tシャツの3ポーズを内蔵画像生成で作成。約1.2秒ごとにローテーションしながらジャンプ。危険状態の優先表示と停止・演出OFFは維持。
 - 七色の紙吹雪45〜120個が画面全体に降下し、ゲーム内の縁が波打つ。ブラウザ自体の枠やボタンの位置は変えない。演出OFFでは紙吹雪・波・ポーズ切替を停止。
 - 本番ビルド・既存15テスト成功。PC 1280×720・1440×900、スマホ375×667でショップを含めた配置を確認。スマホで黄色衣装と紙吹雪・波打つ縁の表示を確認。
+
+
+## 2026-09-13 v0.4
+- Build and all 17 automated tests passed, including purchase escalation, insufficient funds, reset, and multi-purchase replay equality.
+- Five-seed 15-minute endless policy check: all survived 900 seconds; 24–25 purchases, zero spare tickets. This is a soft economic constraint, not a fixed end time.
+- Browser: ready call visible with time 00:00 and controls disabled; normal play resumes. Real meltdown shows soot/cough Mary; result selector switches from survival to endless and resets timer, controls, price and tickets.
+- Desktop 1280x720 and mobile 375x667 checked for transparent enlarged Mary and single-screen layout. No physical Android/iOS device test.
+- Native alpha verified for soot art; worker/fever alpha verified 0–255, previewed against dark green.

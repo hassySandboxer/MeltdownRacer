@@ -1,5 +1,17 @@
-export type MusicScene = "normal" | "fever" | "sad";
+import { C } from "./config";
+import type { Simulation } from "./simulation";
+export type MusicScene = "normal" | "fever" | "sad" | "clear";
+export function musicScene(s: Pick<Simulation, "ended" | "mode" | "time" | "danger" | "fever">): MusicScene {
+  if (s.ended) return s.mode === "daily" && s.time >= C.dailySeconds && s.danger < 100 ? "clear" : "sad";
+  return s.fever > 0 ? "fever" : "normal";
+}
 export const MUSIC = {
+  clear: {
+    bpm: 144,
+    melody: [72, 76, 79, 84, 0, 79, 84, 88, 86, 89, 93, 89, 79, 83, 86, 91,
+      84, 88, 91, 96, 0, 91, 88, 84, 86, 83, 79, 83, 84, 0, 0, 0],
+    roots: [48, 53, 55, 48],
+  },
   normal: {
     bpm: 112,
     melody: [72, 76, 79, 76, 74, 77, 81, 77, 72, 76, 79, 84, 83, 79, 77, 74],
@@ -93,6 +105,10 @@ export class GameAudio {
         this.tone(root, at, interval * 3, 0.12, "triangle");
         for (const offset of [12, scene === "sad" ? 15 : 16, 19])
           this.tone(root + offset, at, interval * 3.8, 0.022, "sine");
+      }
+      if (scene === "clear" && melody) {
+        // Bell-like octave doubles and a rising major-key victory cadence.
+        this.tone(melody + 12, at, interval * 1.8, 0.035, "sine");
       }
       if (scene === "fever") {
         this.tone(

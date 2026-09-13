@@ -4,7 +4,7 @@ import { C } from "./config";
 import { render } from "./rendering";
 import { drawEffects, drawPlant } from "./effects";
 import { LocalRanking, japanDate, dailySeed } from "./ranking";
-import { GameAudio } from "./audio";
+import { GameAudio, musicScene } from "./audio";
 import { maryMarkup, updateMary } from "./mary";
 const $ = <T extends HTMLElement = HTMLElement>(id: string) =>
   document.getElementById(id) as T;
@@ -396,7 +396,7 @@ function frame(now: number) {
     }
   }
   audio.update(
-    s.ended ? "sad" : s.fever > 0 ? "fever" : "normal",
+    musicScene(s),
     started && !paused && !document.hidden && readyRemaining <= 0,
     blastStart < 0 || now - blastStart > 1200,
   );

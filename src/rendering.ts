@@ -96,29 +96,33 @@ export function render(
     if (f.spent && f.flash > 0) {
       const age = 1 - f.flash / 0.45;
       const feverBurst = s.fever > 0 && intense;
-      const count = intense ? (feverBurst ? 10 : 5) : 3;
-      const radius = 4 + age * (feverBurst ? 23 : 12);
+      const count = intense ? (feverBurst ? 20 : 5) : 3;
+      const radius = 4 + age * (feverBurst ? 46 : 12);
       ctx.save();
       ctx.globalAlpha = Math.max(0, 1 - age);
       ctx.lineWidth = feverBurst ? 1.8 : 1;
       for (let j = 0; j < count; j++) {
         const angle = j * Math.PI * 2 / count + f.x * 0.03;
         const x = f.x + Math.cos(angle) * radius;
-        const y = f.y + Math.sin(angle) * radius;
-        ctx.fillStyle = feverBurst ? `hsl(${j * 36},100%,76%)` : "#e5ffb0";
+        const y = f.y + Math.sin(angle) * radius + (feverBurst ? age * age * 9 : 0);
+        ctx.fillStyle = feverBurst ? `hsl(${j * 360 / count + f.y},100%,76%)` : "#e5ffb0";
         ctx.beginPath();
         ctx.arc(x, y, (feverBurst ? 2.4 : 1.5) * (1 - age * 0.6), 0, Math.PI * 2);
         ctx.fill();
         if (feverBurst) {
           ctx.strokeStyle = ctx.fillStyle;
           ctx.beginPath();
-          ctx.moveTo(x - 3, y); ctx.lineTo(x + 3, y);
-          ctx.moveTo(x, y - 3); ctx.lineTo(x, y + 3);
+          // Radial comet trails with a slight falling arc, like tiny fireworks.
+          const tail = Math.max(3, radius * 0.28);
+          ctx.moveTo(x - Math.cos(angle) * tail, y - Math.sin(angle) * tail);
+          ctx.lineTo(x, y);
+          ctx.moveTo(x - 4, y); ctx.lineTo(x + 4, y);
+          ctx.moveTo(x, y - 4); ctx.lineTo(x, y + 4);
           ctx.stroke();
         }
       }
       ctx.beginPath();
-      ctx.arc(f.x, f.y, 3 + age * (feverBurst ? 17 : 8), 0, Math.PI * 2);
+      ctx.arc(f.x, f.y, 3 + age * (feverBurst ? 34 : 8), 0, Math.PI * 2);
       ctx.strokeStyle = feverBurst ? "#fff2c8" : "#dbff9d";
       ctx.stroke();
       ctx.restore();

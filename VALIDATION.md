@@ -73,3 +73,9 @@
 - Browser: ready call visible with time 00:00 and controls disabled; normal play resumes. Real meltdown shows soot/cough Mary; result selector switches from survival to endless and resets timer, controls, price and tickets.
 - Desktop 1280x720 and mobile 375x667 checked for transparent enlarged Mary and single-screen layout. No physical Android/iOS device test.
 - Native alpha verified for soot art; worker/fever alpha verified 0–255, previewed against dark green.
+
+
+## Clear music and fever fireworks
+- Build and 18 tests pass. Scene-selection test covers daily success, same-tick meltdown, early shutdown, other modes, normal and fever.
+- Clear scene: 144 BPM major-key melody, octave bell accents and tonic ending. Sad scene remains for failures.
+- Fever fission rendering: 10 to 20 sparks, radial travel 23 to 46, ring expansion 17 to 34, rainbow trails and gravity arc. Normal/reduced effects unchanged; simulation and replay rules unchanged.

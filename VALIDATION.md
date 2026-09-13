@@ -91,3 +91,10 @@
 - Replaced rainbow mirror tiles with a smooth cyan-white radial glow and slow subtle luminance variation.
 - Active fuel retains green fill with dark green outlines. Fever neutrons use seven saturated colors, dark outlines and longer trails; palette is direction-based to avoid recoloring when other neutrons disappear. Legend updated.
 - Production build and whitespace validation passed. Visual-only change; simulation and audio unchanged.
+
+
+## Four-panel tutorial
+- Added illustrated Mary introduction covering controls/cooling, spent fuel refill, fever scoring and meltdown danger. Existing character artwork reused; text is selectable HTML.
+- Browser verified automatic first display, dismiss + reload does not auto-open again, question-mark reopens, and opening during play pauses the run. No console errors.
+- Checked desktop 2x2 panels and 375x667 mobile vertical panels with scrolling. Detailed guide remains expandable. Production build passed.
+- Seen flag stored per browser/origin when dialog closes, including Escape. Storage failures fall back to showing the tutorial.

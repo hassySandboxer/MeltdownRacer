@@ -1,4 +1,5 @@
 import "./style.css";
+import { tutorialMarkup, TUTORIAL_KEY } from "./tutorial";
 import { Simulation, type Mode } from "./simulation";
 import { C } from "./config";
 import { render } from "./rendering";
@@ -9,7 +10,7 @@ import { maryMarkup, updateMary } from "./mary";
 const $ = <T extends HTMLElement = HTMLElement>(id: string) =>
   document.getElementById(id) as T;
 document.querySelector("#app")!.innerHTML = `
-<header><a class="brand" href="./"><span class="brand-orbit">♥</span><span class="pop-logo"><small>どきどき<span>☆</span></small>メルトダウン</span></a><div class="header-actions"><span class="local-dot">LOCAL SYSTEM</span><button id="sound" aria-pressed="false">音声 ON</button><button id="records-open">記録</button><button id="effects" aria-pressed="true">演出 ON</button><button id="help">?</button></div></header>
+<header><a class="brand" href="./"><span class="brand-orbit">♥</span><span class="pop-logo"><small>どきどき<span>☆</span></small>メルトダウン</span></a><div class="header-actions"><span class="local-dot">LOCAL SYSTEM</span><button id="sound" aria-pressed="false">音声 ON</button><button id="records-open">記録</button><button id="effects" aria-pressed="true">演出 ON</button><button id="help" aria-label="遊び方（4コマ漫画）">?</button></div></header>
 <main><div class="page-heading"><div><p class="eyebrow">CONTROL ROOM / 01</p><h1>かわいく発電。油断でドカン。</h1><p class="intro">連鎖を育て、熱を逃がす。限界の手前が、ハイスコア。</p></div><div class="session"><span id="mode-label">SURVIVAL</span><strong id="clock">00:00</strong><button id="speed" disabled title="シミュレーションを早送り">▶ ×1</button><button id="pause" disabled>停止</button></div></div>
 <section class="score-strip" aria-label="運転成績"><div><label>TOTAL SCORE / 得点</label><strong id="score">000000</strong></div><div><label>NET OUTPUT / 正味出力</label><strong><span id="power">0</span><small>PU</small></strong></div><div><label>ENERGY / 累計発電</label><strong><span id="energy">0.000</span><small>EU</small></strong></div><div class="multiplier"><label>SCORE MULTIPLIER</label><strong id="multiplier">×1.00</strong></div></section>
 <div class="game-layout"><section class="reactor-panel"><div class="panel-heading"><span><i class="status-dot"></i> REACTOR CORE</span><span id="state">STANDBY / 待機中</span></div><div class="core-wrap"><canvas id="core" width="560" height="560" aria-label="円形炉。緑の燃料、通常は白・フィーバー中は虹色の中性子、灰色の使用済み燃料。区画をクリックして補給先を選択。"></canvas>${maryMarkup}<div class="core-tag tag-left">01<br><span>FISSION<br>CHAMBER</span></div><div class="core-tag tag-right">CORE<br><span id="fuel-count">0 CELLS</span></div><div id="ready" class="ready-call" role="status" hidden></div><div id="overlay" class="overlay"><p class="eyebrow">SWEET LOOKS. SERIOUS REACTOR.</p><h2 class="title-logo"><small>どきどき<span>☆</span></small>メルトダウン</h2><div class="mascot" aria-hidden="true">◕‿◕<span>♥</span></div><p>めざせ臨界フィーバー！<br>かわいい顔して、冷却はシビア。</p><div class="mode-select"><button id="survival-mode" class="selected">生存モード</button><button id="daily-mode">日替わり 5分</button><button id="endless-mode">∞ ショップ</button></div><button id="start" class="primary">運転を開始 <span>↗</span></button><small id="start-note">失敗するまで続く、生存チャレンジ</small></div></div><div class="plant"><canvas id="plant" aria-label="冷却水槽、水流、蒸気配管と発電タービン"></canvas><div class="plant-readout"><span id="cooling-info"></span><span id="pump-info"></span></div></div><div class="legend"><span><i class="fuel-dot"></i>燃料</span><span><i class="neutron-dot"></i>中性子</span><span><i class="spent-dot"></i>使用済み</span><span><i class="rod-dot"></i>制御棒</span></div></section>
@@ -28,7 +29,7 @@ document.querySelector("#app")!.innerHTML = `
   .join("")}</section>
 <section class="panel controls"><div class="panel-heading"><span>OPERATOR CONTROLS</span><span class="dim">手動操作</span></div><div class="rod-heading"><b>制御棒の挿入数</b><output id="rods-value">50%</output></div><input id="rods" type="range" min="0" max="100" value="50" aria-label="制御棒の挿入数"><p class="rod-note" id="rod-count">32 / 64 本・4本ずつ均等に挿入</p><label class="control-label" for="flow">02 <b>冷却水の流量</b><output id="flow-value">42%</output></label><input id="flow" type="range" min="0" max="100" value="42"><div class="range-caption"><span>低流量 / 省電力</span><span>高流量 / 冷却 ↑</span></div><div class="control-label"><b>燃料補給</b><output id="refills">残り 8 / 8 回</output></div><p class="refill-rule">1回で選択区画の灰色燃料を交換・12秒間隔</p><div class="sectors" aria-label="補給区画">${["左上", "右上", "左下", "右下"].map((x, i) => `<button data-sector="${i}" class="${i === 0 ? "selected" : ""}" aria-pressed="${i === 0}">${x}<span id="sector-${i}">0 使用済み</span></button>`).join("")}</div><button id="refill" class="refill" disabled>選択区画を補給 <span>↻</span></button><div id="shop-panel" class="shop-panel" hidden><div><b>⚡ ねんりょう屋さん</b><output id="credits">0 ⚡</output></div><button id="buy-fuel" disabled>補給券 +1　120 ⚡</button><small>1 EU → 1,000 ⚡・購入ごとに +15 ⚡</small><p id="shop-message" role="status">発電で貯めて、補給券を買おう！</p></div><p class="keyboard">A / D 制御棒　 W / S 流量　 R 補給　 Space 停止</p></section></aside></div>
 <dialog id="records-dialog"><button id="records-close">閉じる</button><section class="records panel"><div class="panel-heading"><span>PERSONAL BEST / ローカル記録</span><span class="dim">このブラウザに保存</span></div><div id="records"></div></section></dialog><footer><span>MELTDOWNRACER <b>v0.4</b> / LOCAL EDITION</span><span>架空のアーケードゲームです。実在の原子炉を再現するものではありません。</span></footer></main>
-<canvas id="fx" aria-hidden="true"></canvas><dialog id="help-dialog"><div class="dialog-body"><p class="eyebrow">OPERATOR’S GUIDE</p><h2>熱と連鎖は、別のもの。</h2><p>白い中性子が緑の燃料に当たると、確率で分裂。熱と次の中性子を生みます。灰色の燃料は使用済みです。</p><ol><li><b>制御棒</b>は炉内に均等配置された64個の吸収点です。スライダーで0〜100%を選ぶと、上下左右の対称な4本組で挿入されます。黒い丸が挿入中、薄い丸が未挿入。A/Dキーでも操作できます。挿入すると中性子を吸収します。反応を抑えても、蓄積した熱はすぐには消えません。</li><li><b>冷却水</b>で炉温を下げ、水位を回復。ポンプにも電力が必要なため、流量を上げすぎると正味出力が下がります。</li><li><b>区画を選んで補給</b>すると使用済み燃料を交換。8回まで・12秒間隔で使えます。</li><li>反応 1.8〜15、出力 12 以上を5秒維持して<b>フィーバー</b>。安定倍率は最大3倍、高温倍率は最大2倍です。</li><li>炉温105または圧力100を超えると危険度が上昇。100%で設備破裂。開始20秒後から、低反応かつ炉温30未満が10秒続くと低温停止です。</li></ol><p>∞ショップモードは終了時間なし。発電1 EUごとに1,000⚡を獲得し、初回120⚡で区画補給券を1枚購入できます。購入するたびに15⚡ずつ値上がりします（120 → 135 → 150…）。新しい運転では初回価格に戻ります。補給の12秒待ち・過熱・低温停止は残ります。累計発電量やスコアは買い物で減りません。</p><p>▶ ×1ボタンで2倍・4倍・8倍の早送り。温度・反応・得点すべて同じ速度で進みます。燃料が減った後の待ち時間にも使えます。演出ボタンで強い光と揺れを抑えられます。</p><p>タブを離れると自動停止します。日替わりは日本時間の日付で共通シードを使用するローカル練習版です。</p><button id="close-help" class="primary">操作室に戻る</button></div></dialog>`;
+<canvas id="fx" aria-hidden="true"></canvas><dialog id="help-dialog" aria-labelledby="help-title"><div class="dialog-body">${tutorialMarkup}<details class="guide-details"><summary>もっと詳しいルール・操作を見る</summary><p class="eyebrow">OPERATOR’S GUIDE</p><h2>熱と連鎖は、別のもの。</h2><p>白い中性子が緑の燃料に当たると、確率で分裂。熱と次の中性子を生みます。灰色の燃料は使用済みです。</p><ol><li><b>制御棒</b>は炉内に均等配置された64個の吸収点です。スライダーで0〜100%を選ぶと、上下左右の対称な4本組で挿入されます。黒い丸が挿入中、薄い丸が未挿入。A/Dキーでも操作できます。挿入すると中性子を吸収します。反応を抑えても、蓄積した熱はすぐには消えません。</li><li><b>冷却水</b>で炉温を下げ、水位を回復。ポンプにも電力が必要なため、流量を上げすぎると正味出力が下がります。</li><li><b>区画を選んで補給</b>すると使用済み燃料を交換。8回まで・12秒間隔で使えます。</li><li>反応 1.8〜15、出力 12 以上を5秒維持して<b>フィーバー</b>。安定倍率は最大3倍、高温倍率は最大2倍です。</li><li>炉温105または圧力100を超えると危険度が上昇。100%で設備破裂。開始20秒後から、低反応かつ炉温30未満が10秒続くと低温停止です。</li></ol><p>∞ショップモードは終了時間なし。発電1 EUごとに1,000⚡を獲得し、初回120⚡で区画補給券を1枚購入できます。購入するたびに15⚡ずつ値上がりします（120 → 135 → 150…）。新しい運転では初回価格に戻ります。補給の12秒待ち・過熱・低温停止は残ります。累計発電量やスコアは買い物で減りません。</p><p>▶ ×1ボタンで2倍・4倍・8倍の早送り。温度・反応・得点すべて同じ速度で進みます。燃料が減った後の待ち時間にも使えます。演出ボタンで強い光と揺れを抑えられます。</p><p>タブを離れると自動停止します。日替わりは日本時間の日付で共通シードを使用するローカル練習版です。</p></details><div class="tutorial-footer"><button id="close-help" class="primary">わかった！操作室へ ↗</button><small>右上の「？」から、いつでも読み返せます。</small></div></div></dialog>`;
 // Keep a single set of controls and move only the fever panel on narrow screens.
 const header = document.querySelector("header")!;
 const actions = document.querySelector(".header-actions")!;
@@ -157,11 +158,16 @@ $("sound").onclick = () => {
   $("sound").textContent = audio.muted ? "音声 OFF" : "音声 ON";
   $("sound").setAttribute("aria-pressed", String(audio.muted));
 };
-$("help").onclick = () => {
+function openHelp() {
   if (started && !s.ended) togglePause(true);
+  $("help-dialog").scrollTop = 0;
   $<HTMLDialogElement>("help-dialog").showModal();
-};
+}
+$("help").onclick = openHelp;
 $("close-help").onclick = () => $<HTMLDialogElement>("help-dialog").close();
+$("help-dialog").addEventListener("close", () => {
+  try { localStorage.setItem(TUTORIAL_KEY, "1"); } catch { /* Tutorial still works without storage. */ }
+});
 function syncControls() {
   $<HTMLInputElement>("rods").value = String(s.rods);
   $<HTMLInputElement>("flow").value = String(s.flow);
@@ -423,4 +429,7 @@ function frame(now: number) {
   requestAnimationFrame(frame);
 }
 records();
+let tutorialSeen = false;
+try { tutorialSeen = localStorage.getItem(TUTORIAL_KEY) === "1"; } catch { /* Show the guide when storage is unavailable. */ }
+if (!tutorialSeen) openHelp();
 requestAnimationFrame(frame);

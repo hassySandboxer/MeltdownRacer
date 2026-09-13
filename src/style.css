@@ -1651,3 +1651,5 @@ aside { grid-template-rows: 165px minmax(0,1fr); }
 .overlay.result { left: 0; width: calc(100% - 180px); transform: translateY(-50%); padding: 12px; }
 @media(min-height:731px) and (min-width:701px) { .overlay.result { width: calc(100% - 218px); } }
 @media(max-width:700px) { .overlay.result { width: calc(100% - 112px); padding: 7px; } .overlay.result .result-stats { gap: 5px; } }
+
+.fever .legend .neutron-dot { background: linear-gradient(135deg,#e52a60,#e97513,#ba9300,#008b52,#007bc4,#5749db,#b824bd); outline: 1px solid #17304b; }

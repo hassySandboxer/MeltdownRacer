@@ -42,39 +42,26 @@ export function render(
   ctx.beginPath();
   ctx.arc(0, 0, C.radius, 0, Math.PI * 2);
   ctx.clip();
-  const g = ctx.createRadialGradient(0, 0, 20, 0, 0, 240);
-  g.addColorStop(0, "#14333b");
-  g.addColorStop(1, "#07191f");
+  const luminous = s.fever > 0 && !s.ended;
+  const t = intense ? motionTime : 0;
+  const g = ctx.createRadialGradient(0, 0, 15, 0, 0, 240);
+  g.addColorStop(0, luminous ? "#ecfcff" : "#14333b");
+  g.addColorStop(.65, luminous ? "#99e3f5" : "#102b33");
+  g.addColorStop(1, luminous ? "#319cc8" : "#07191f");
   ctx.fillStyle = g;
   ctx.fillRect(-240, -240, 480, 480);
-  if (s.fever > 0 && !s.ended) {
-    // Reflections stay behind fuel; use wall-clock motion so fast-forward is not a strobe.
-    const t = intense ? motionTime : 0;
+  if (luminous) {
+    // Broad cyan-white glow, without patterned highlights competing with fuel.
     ctx.save();
-    ctx.globalCompositeOperation = "screen";
-    for (let row = -10; row <= 10; row++) {
-      for (let col = -10; col <= 10; col++) {
-        const x = col * 24, y = row * 24;
-        if (x * x + y * y > 250 * 250) continue;
-        const shimmer = Math.pow(Math.max(0, Math.sin(col * .68 + row * .47 + t * 1.8)), 6);
-        ctx.fillStyle = `hsla(${col * 19 + row * 27 + t * 32},95%,${32 + shimmer * 45}%,${intense ? .17 + shimmer * .48 : .12})`;
-        ctx.fillRect(x + 2, y + 2, 20, 20);
-        if (intense && shimmer > .85) {
-          ctx.fillStyle = `rgba(255,245,255,${(shimmer - .85) * 2})`;
-          ctx.fillRect(x + 10, y + 4, 2, 16);
-          ctx.fillRect(x + 4, y + 10, 16, 2);
-        }
-      }
-    }
-    if (intense) for (let i = 0; i < 6; i++) {
-      const a = t * .24 + i * Math.PI / 3;
-      const beam = ctx.createLinearGradient(0, 0, Math.cos(a) * 240, Math.sin(a) * 240);
-      beam.addColorStop(0, "#ffffff03");
-      beam.addColorStop(1, `hsla(${i * 60 + t * 25},100%,75%,.2)`);
-      ctx.fillStyle = beam;
-      ctx.beginPath(); ctx.moveTo(0, 0);
-      ctx.arc(0, 0, 240, a - .12, a + .12); ctx.closePath(); ctx.fill();
-    }
+    const glow = ctx.createRadialGradient(-45, -60, 0, -45, -60, 230);
+    glow.addColorStop(0, `rgba(255,255,255,${intense ? .16 + .06 * Math.sin(t * 1.6) : .14})`);
+    glow.addColorStop(1, "#ffffff00");
+    ctx.fillStyle = glow;
+    ctx.fillRect(-240, -240, 480, 480);
+    ctx.strokeStyle = "#d8fbff";
+    ctx.lineWidth = 5;
+    ctx.globalAlpha = intense ? .55 + .15 * Math.sin(t * 1.6) : .55;
+    ctx.beginPath(); ctx.arc(0, 0, 231, 0, Math.PI * 2); ctx.stroke();
     ctx.restore();
   }
   const surface = 235 - s.water * 4.7;
@@ -162,6 +149,11 @@ export function render(
     ctx.arc(f.x, f.y, f.spent ? 3 : 4.3, 0, Math.PI * 2);
     ctx.fillStyle = f.flash > 0.2 ? "#edffd0" : f.spent ? "#3b5059" : "#b7e984";
     ctx.fill();
+    if (luminous && !f.spent) {
+      ctx.strokeStyle = "#24472a";
+      ctx.lineWidth = 1.7;
+      ctx.stroke();
+    }
     if (!f.spent) {
       ctx.fillStyle = "#e5ffb5";
       ctx.fillRect(f.x - 1, f.y - 2, 2, 2);
@@ -180,17 +172,28 @@ export function render(
       ctx.fillRect(r.x - 2, r.y - 2, 4, 4);
     }
   }
-  ctx.lineWidth = 1;
+  const neutronColors = ["#e52a60", "#e97513", "#ba9300", "#008b52", "#007bc4", "#5749db", "#b824bd"];
   for (const n of s.neutrons) {
-    ctx.strokeStyle = "#eaffc369";
+    const i = Math.floor((Math.atan2(n.vy, n.vx) + Math.PI) / (Math.PI * 2) * 7) % 7;
+    const color = luminous ? neutronColors[i % neutronColors.length] : "#f4ffe5";
     ctx.beginPath();
-    ctx.moveTo(n.x - n.vx * 0.045, n.y - n.vy * 0.045);
+    ctx.moveTo(n.x - n.vx * 0.065, n.y - n.vy * 0.065);
     ctx.lineTo(n.x, n.y);
+    if (luminous) {
+      ctx.strokeStyle = "#17304b";
+      ctx.lineWidth = 3.8;
+      ctx.stroke();
+    }
+    ctx.strokeStyle = luminous ? color : "#eaffc369";
+    ctx.lineWidth = luminous ? 2.2 : 1;
     ctx.stroke();
-    ctx.fillStyle = "#f4ffe5";
     ctx.beginPath();
-    ctx.arc(n.x, n.y, 1.9, 0, Math.PI * 2);
+    ctx.arc(n.x, n.y, luminous ? 3 : 1.9, 0, Math.PI * 2);
+    ctx.fillStyle = color;
     ctx.fill();
+    if (luminous) {
+      ctx.strokeStyle = "#17304b"; ctx.lineWidth = 1.2; ctx.stroke();
+    }
   }
   if (s.ended && s.danger >= 100) {
     ctx.fillStyle = "#ff693338";

@@ -85,3 +85,9 @@
 - Build and 19 tests pass, including dense-burst sound rate limiting, zero-event silence, mute, pause and non-fever gating.
 - Mirror tiles and six rotating rainbow light wedges render behind reactor fuel. Motion uses real elapsed running time, freezes on pause, and is static/dim with effects off.
 - Actual new fever fissions trigger quiet sine chimes aligned to the current BGM chord. Multiple events coalesce with a 125 ms minimum interval, with no delayed sound queue. Sound quality remains subjective; no listening evaluation claimed.
+
+
+## Cyan-white fever visibility revision
+- Replaced rainbow mirror tiles with a smooth cyan-white radial glow and slow subtle luminance variation.
+- Active fuel retains green fill with dark green outlines. Fever neutrons use seven saturated colors, dark outlines and longer trails; palette is direction-based to avoid recoloring when other neutrons disappear. Legend updated.
+- Production build and whitespace validation passed. Visual-only change; simulation and audio unchanged.

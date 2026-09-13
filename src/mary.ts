@@ -1,9 +1,8 @@
 import { Simulation } from "./simulation";
 
 export const maryMarkup = `<div id="mary-companion" class="mary-companion" data-mood="idle" role="img" aria-label="計器を眺める作業員メアリ">
-  <div class="mary-caption" aria-hidden="true">ふむふむ…</div>
   <div class="mary-stage" aria-hidden="true"><div class="mary-sprite"></div><span class="soot-puff"></span><span class="soot-puff second"></span><span class="mary-cheer">♪ ✦</span></div>
-
+  <div class="mary-caption" aria-hidden="true">ふむふむ…</div>
 </div>`;
 
 export function updateMary(el: HTMLElement, s: Simulation, paused: boolean, intense: boolean) {

@@ -97,11 +97,11 @@ export class GameAudio {
         root = song.roots[Math.floor(n / 8) % 4];
       if (melody)
         this.tone(
-          melody,
+          scene === "fever" ? melody - 12 : melody,
           at,
           interval * (scene === "sad" ? 2.7 : 0.8),
-          scene === "fever" ? 0.1 : 0.09,
-          scene === "fever" ? "square" : "triangle",
+          scene === "fever" ? 0.085 : 0.09,
+          "triangle",
         );
       if (n % 4 === 0) {
         this.tone(root, at, interval * 3, 0.12, "triangle");
@@ -117,11 +117,11 @@ export class GameAudio {
           root + 24 + [0, 4, 7, 12][n % 4],
           at,
           interval * 0.6,
-          0.035,
-          "square",
+          0.025,
+          "triangle",
         );
         if (n % 4 === 0) this.kick(at);
-        else if (n % 2 === 0) this.noise(at, 0.065, 0.045, 4000);
+        else if (n % 2 === 0) this.noise(at, 0.065, 0.025, 2400);
       } else if (scene === "normal" && n % 4 === 0) this.kick(at, 0.08);
       this.step++;
       this.next += interval;

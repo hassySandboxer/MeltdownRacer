@@ -79,3 +79,9 @@
 - Build and 18 tests pass. Scene-selection test covers daily success, same-tick meltdown, early shutdown, other modes, normal and fever.
 - Clear scene: 144 BPM major-key melody, octave bell accents and tonic ending. Sad scene remains for failures.
 - Fever fission rendering: 10 to 20 sparks, radial travel 23 to 46, ring expansion 17 to 34, rainbow trails and gravity arc. Normal/reduced effects unchanged; simulation and replay rules unchanged.
+
+
+## Fever mirror reflections and fission chimes
+- Build and 19 tests pass, including dense-burst sound rate limiting, zero-event silence, mute, pause and non-fever gating.
+- Mirror tiles and six rotating rainbow light wedges render behind reactor fuel. Motion uses real elapsed running time, freezes on pause, and is static/dim with effects off.
+- Actual new fever fissions trigger quiet sine chimes aligned to the current BGM chord. Multiple events coalesce with a 125 ms minimum interval, with no delayed sound queue. Sound quality remains subjective; no listening evaluation claimed.

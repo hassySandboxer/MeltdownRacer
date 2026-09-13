@@ -40,6 +40,8 @@ export class GameAudio {
   private step = 0;
   private scene: MusicScene = "normal";
   private active = false;
+  private lastFissionSound = -Infinity;
+  private fissionNote = 0;
   get muted() {
     return this.mutedValue;
   }
@@ -124,6 +126,17 @@ export class GameAudio {
       this.step++;
       this.next += interval;
     }
+  }
+  feverFission(count: number) {
+    const c = this.ctx;
+    if (count <= 0 || !c || c.state !== "running" || !this.active || this.muted || this.scene !== "fever") return;
+    // Coalesce dense chains: no queue, at most eight soft chimes per real second.
+    if (c.currentTime - this.lastFissionSound < 0.125) return;
+    this.lastFissionSound = c.currentTime;
+    const root = MUSIC.fever.roots[Math.floor(Math.max(0, this.step - 1) / 8) % 4];
+    const note = root + [24, 28, 31, 36, 31, 28][this.fissionNote++ % 6];
+    this.tone(note, c.currentTime, .22, .045, "sine");
+    this.tone(note + 12, c.currentTime, .12, .012, "sine");
   }
   private tone(
     midi: number,

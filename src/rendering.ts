@@ -5,6 +5,7 @@ export function render(
   s: Simulation,
   sector: number,
   intense: boolean,
+  motionTime = s.time,
 ) {
   const size = canvas.clientWidth,
     dpr = Math.min(devicePixelRatio || 1, 2);
@@ -46,6 +47,36 @@ export function render(
   g.addColorStop(1, "#07191f");
   ctx.fillStyle = g;
   ctx.fillRect(-240, -240, 480, 480);
+  if (s.fever > 0 && !s.ended) {
+    // Reflections stay behind fuel; use wall-clock motion so fast-forward is not a strobe.
+    const t = intense ? motionTime : 0;
+    ctx.save();
+    ctx.globalCompositeOperation = "screen";
+    for (let row = -10; row <= 10; row++) {
+      for (let col = -10; col <= 10; col++) {
+        const x = col * 24, y = row * 24;
+        if (x * x + y * y > 250 * 250) continue;
+        const shimmer = Math.pow(Math.max(0, Math.sin(col * .68 + row * .47 + t * 1.8)), 6);
+        ctx.fillStyle = `hsla(${col * 19 + row * 27 + t * 32},95%,${32 + shimmer * 45}%,${intense ? .17 + shimmer * .48 : .12})`;
+        ctx.fillRect(x + 2, y + 2, 20, 20);
+        if (intense && shimmer > .85) {
+          ctx.fillStyle = `rgba(255,245,255,${(shimmer - .85) * 2})`;
+          ctx.fillRect(x + 10, y + 4, 2, 16);
+          ctx.fillRect(x + 4, y + 10, 16, 2);
+        }
+      }
+    }
+    if (intense) for (let i = 0; i < 6; i++) {
+      const a = t * .24 + i * Math.PI / 3;
+      const beam = ctx.createLinearGradient(0, 0, Math.cos(a) * 240, Math.sin(a) * 240);
+      beam.addColorStop(0, "#ffffff03");
+      beam.addColorStop(1, `hsla(${i * 60 + t * 25},100%,75%,.2)`);
+      ctx.fillStyle = beam;
+      ctx.beginPath(); ctx.moveTo(0, 0);
+      ctx.arc(0, 0, 240, a - .12, a + .12); ctx.closePath(); ctx.fill();
+    }
+    ctx.restore();
+  }
   const surface = 235 - s.water * 4.7;
   ctx.fillStyle = "#2786aa38";
   ctx.fillRect(-240, surface, 480, 480);

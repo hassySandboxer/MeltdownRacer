@@ -371,6 +371,7 @@ function updateUI() {
         : `選択区画を補給 <span>↻</span>`;
 }
 function frame(now: number) {
+  let feverFissions = 0;
   const elapsed = Math.min((now - last) / 1000, 0.1);
   last = now;
   if (started && !paused && !s.ended && readyRemaining > 0) {
@@ -382,7 +383,9 @@ function frame(now: number) {
   if (started && !paused && !s.ended && readyRemaining <= 0) {
     accumulator += elapsed * speed;
     while (accumulator >= C.dt && !s.ended) {
+      const beforeFissions = s.fissions;
       s.step();
+      if (s.fever > 0) feverFissions += s.fissions - beforeFissions;
       accumulator -= C.dt;
       if (s.ended) {
         if (s.danger >= 100) {
@@ -400,9 +403,10 @@ function frame(now: number) {
     started && !paused && !document.hidden && readyRemaining <= 0,
     blastStart < 0 || now - blastStart > 1200,
   );
+  if (!s.ended) audio.feverFission(feverFissions);
   updateUI();
   updateMary($("mary-companion"), s, paused, intense);
-  render(canvas, s, selected, intense);
+  render(canvas, s, selected, intense, plantMotion);
   if (started && !paused && !s.ended && readyRemaining <= 0) plantMotion += elapsed;
   drawPlant($<HTMLCanvasElement>("plant"), s, plantMotion, intense);
   drawEffects(

@@ -1,0 +1,100 @@
+# 検証記録
+
+## v0.3 — 2026-09-12
+
+- 本番ビルド成功・15テスト成功。0〜100%の全設定で制御棒の単調な本数変化と四方向対称配置、高速中性子の円形制御棒との衝突、購入とリプレイ、残高不足・終了後の購入拒否、補給待ち時間維持を検証。
+- 初期操作固定の50シード：30秒未満の終了0件、終了64.1〜286.1秒、全件フィーバー。温度に応じた操作と補給を行う5シードは全件300秒クリア。
+- ショップモードで自動操作する5シードは全件900秒継続、購入35〜36回。発電収入で補給を継続できることを確認（人間による難易度評価とは別）。
+- ブラウザで120クレジットの購入・補給券増加・累計発電量保持、均等配置の制御棒、七色フィーバー、終了画面を確認。警告・エラーログ0件。
+- PC 1280×720、スマホ相当390×844・375×667でショップを含む操作画面の1画面配置を目視確認。
+- 通常112 BPM・フィーバー172 BPM・終了時66 BPMの音楽を実装。音の聴感バランスとスマホ実機での性能は未検証。
+## v0.2 — 2026-09-11
+
+- 本番ビルド成功・13テスト成功。独立制御棒、同時操作、個別操作のリプレイ、旧版スコア保持を追加検証。
+- 初期操作固定の50シード：30秒未満の終了0件、終了69.5〜227.7秒、49件でフィーバー。温度に応じた操作と補給を行う5シードは全件300秒クリア。
+- PC 1280×720、スマホ相当390×844・375×667で炉・計器・全操作の1画面配置を目視確認。小型画面のタイトル説明は内部スクロール可能。
+- ブラウザで個別操作（棒1=10%、棒4=90%）、同時操作（全棒0%）、1→2→4→8倍速を確認。
+- 8倍速で運転31秒時点に設備破裂。全画面爆発から結果へ遷移し、10,672点・0.909 EU・フィーバー21.3秒の記録保存を確認。警告・エラーログ0件。
+- 水槽水位、流量に応じた配管・炉内水流、出力に応じた蒸気・タービン・発電表示を追加。音の聴感調整とスマホ実機の性能確認は引き続き対象。
+
+## v0.1 — 2026-09-10
+
+## 自動検証
+
+- `npm run build`：TypeScript型検査・Vite本番ビルド成功。
+- `npm test`：10件成功。同一シードとtick入力で全状態一致、30FPS相当の更新束でも得点・発電量一致、燃料二重分裂なし、中性子上限、制御棒抑制、冷却と電力消費、補給制限、低温猶予、過熱猶予、余熱倍率禁止、高速線分衝突、日替わり時間到達を検証。
+- 50シード・初期操作固定・補給なし：30秒未満の終了0件、全50件でフィーバー成立。終了時間70.3〜228.3秒。固定操作で永久運転するケースなし（検証した50シードの範囲）。
+- 炉温に応じた操作・区画補給を行う5シード：全5件で300秒クリア。スコア11,152 / 12,295 / 15,012 / 10,693 / 13,532。人間による難易度評価とは別の到達可能性試験です。
+
+## ブラウザ検証
+
+ローカルHTTPでCanvas描画・開始・計器更新を確認。390px幅のスマートフォン相当のレスポンシブ表示を確認。PC表示でスライダー変更、区画補給（8→7回、12秒クールダウン）、フィーバー、一時停止を確認。
+
+本番ビルド（127.0.0.1:4173）で制御棒0%・冷却0%にすると、危険警告から29秒時点で設備破裂し、6,175点・0.660 EU・最長9.0秒の結果とローカル記録が表示された。再挑戦で得点・時間・操作・補給回数が初期化された。D / Wキーで制御棒60→65%、流量42→47%となることと、ミュート切替を確認。取得したブラウザの警告・エラーログは0件。
+
+## 残る検証
+
+スマートフォン実機でのタッチ操作・処理性能、音楽の聴感バランス、長期の難易度調整、複数ブラウザエンジン間のリプレイ一致、オンラインランキングと中断時ルールは今後の対象です。
+
+## コンパクト配置・リアクション演出
+
+- 倍率の整数到達時に拡大と2回のバウンド。各節目は1運転につき初回のみ。再挑戦でリセットし、一時停止と演出OFFに対応。
+- タービンは発電量に応じて青緑から赤へ変化し、弾みと光が増加。早送りとは独立した演出時間で動作。
+- フィーバーゲージを計器上部へ移し、太く短く変更。横幅を制限して炉の左右の余白を圧縮。
+- 本番ビルド・既存15テスト成功。ブラウザで1280×720、375×667、1846×984の表示を確認。1280×720のショップ操作欄は内部スクロールなし。実行時エラー・警告0件。
+
+## パステル工場テーマと継続バウンド
+
+- 倍率に連動して文字を連続的に拡大（最大1.35倍）、跳ね幅とテンポを増加。その倍率中は繰り返し、倍率低下時も追従。一時停止・演出OFF・終了に対応。
+- 内蔵画像生成ツールでパステル工場背景を生成し、ゲームに同梱。プロンプトは public/art/GENERATION.md に記録。
+- M PLUS Rounded 1cのRegular・ExtraBoldをライセンスとともに同梱。外部フォントサービスへの通信やOSへのインストールが不要。
+- 本番ビルドと15テスト成功。PCおよび375×667で背景、丸文字、ショップの配置を確認。4種類のOSの実機比較は未実施。
+
+## メアリの作業員マスコット
+
+- ユーザーの蒼乃メアリ三面図をもとに、青いつなぎ・安全第一ヘルメットの約3頭身イラストを内蔵画像生成ツールで作成。通常・笑顔・慌て顔の3枚を1枚の画像に収録。
+- 通常はゆっくり揺れ、フィーバー中はジャンプ。危険度40%以上では慌て顔と回転する計器に切替。危険はフィーバーより優先し、終了時は落ち着く。
+- ミニ計器は発電・炉温・圧力に連動。慌て演出中のみ針が回転する装飾表示。一時停止・演出OFF・動きを減らす設定に対応。
+- 本番ビルド・15テスト成功。PC 1280×720で通常・フィーバー表示、375×667でショップを含めた配置を確認。画像と最終プロンプトを public/art に同梱。
+- 追加確認：一時停止でマスコットに停止状態が適用され、演出OFFで全アニメーション無効状態になることをブラウザで確認。再挑戦で通常状態に復帰。
+
+## ヘッダー集約・メアリのフィーバー衣装
+
+- 説明・時間・速度・停止をヘッダーへ集約。PCはスコアの右にフィーバーを置き、その下に計器を整列。スマホはフィーバーを計器側に戻して読みやすさを維持。
+- ミニ計器を撤去。炉を左上へ寄せ、メアリを炉パネル内の右下へ配置。冷却水・数値・凡例を独立した行にし、発電バーを8描画単位上へ移動。
+- 黄色の☢Tシャツの3ポーズを内蔵画像生成で作成。約1.2秒ごとにローテーションしながらジャンプ。危険状態の優先表示と停止・演出OFFは維持。
+- 七色の紙吹雪45〜120個が画面全体に降下し、ゲーム内の縁が波打つ。ブラウザ自体の枠やボタンの位置は変えない。演出OFFでは紙吹雪・波・ポーズ切替を停止。
+- 本番ビルド・既存15テスト成功。PC 1280×720・1440×900、スマホ375×667でショップを含めた配置を確認。スマホで黄色衣装と紙吹雪・波打つ縁の表示を確認。
+
+
+## 2026-09-13 v0.4
+- Build and all 17 automated tests passed, including purchase escalation, insufficient funds, reset, and multi-purchase replay equality.
+- Five-seed 15-minute endless policy check: all survived 900 seconds; 24–25 purchases, zero spare tickets. This is a soft economic constraint, not a fixed end time.
+- Browser: ready call visible with time 00:00 and controls disabled; normal play resumes. Real meltdown shows soot/cough Mary; result selector switches from survival to endless and resets timer, controls, price and tickets.
+- Desktop 1280x720 and mobile 375x667 checked for transparent enlarged Mary and single-screen layout. No physical Android/iOS device test.
+- Native alpha verified for soot art; worker/fever alpha verified 0–255, previewed against dark green.
+
+
+## Clear music and fever fireworks
+- Build and 18 tests pass. Scene-selection test covers daily success, same-tick meltdown, early shutdown, other modes, normal and fever.
+- Clear scene: 144 BPM major-key melody, octave bell accents and tonic ending. Sad scene remains for failures.
+- Fever fission rendering: 10 to 20 sparks, radial travel 23 to 46, ring expansion 17 to 34, rainbow trails and gravity arc. Normal/reduced effects unchanged; simulation and replay rules unchanged.
+
+
+## Fever mirror reflections and fission chimes
+- Build and 19 tests pass, including dense-burst sound rate limiting, zero-event silence, mute, pause and non-fever gating.
+- Mirror tiles and six rotating rainbow light wedges render behind reactor fuel. Motion uses real elapsed running time, freezes on pause, and is static/dim with effects off.
+- Actual new fever fissions trigger quiet sine chimes aligned to the current BGM chord. Multiple events coalesce with a 125 ms minimum interval, with no delayed sound queue. Sound quality remains subjective; no listening evaluation claimed.
+
+
+## Cyan-white fever visibility revision
+- Replaced rainbow mirror tiles with a smooth cyan-white radial glow and slow subtle luminance variation.
+- Active fuel retains green fill with dark green outlines. Fever neutrons use seven saturated colors, dark outlines and longer trails; palette is direction-based to avoid recoloring when other neutrons disappear. Legend updated.
+- Production build and whitespace validation passed. Visual-only change; simulation and audio unchanged.
+
+
+## Four-panel tutorial
+- Added illustrated Mary introduction covering controls/cooling, spent fuel refill, fever scoring and meltdown danger. Existing character artwork reused; text is selectable HTML.
+- Browser verified automatic first display, dismiss + reload does not auto-open again, question-mark reopens, and opening during play pauses the run. No console errors.
+- Checked desktop 2x2 panels and 375x667 mobile vertical panels with scrolling. Detailed guide remains expandable. Production build passed.
+- Seen flag stored per browser/origin when dialog closes, including Escape. Storage failures fall back to showing the tutorial.
